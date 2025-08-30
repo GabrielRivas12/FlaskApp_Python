@@ -1,10 +1,56 @@
 {% extends 'base.html' %}
 
-{% block titulo %} Login Page
-    
-{% endblock titulo %}
+{% block titulo %} Login Page {% endblock titulo %}
 
-{% block  body %}
-    <h1> Inicio de sesión </h1>
-    <h2> con su cuenta </h2>
-{% endblock  %}
+{% block body %}
+<div style="background-color: #d5eadc; display: flex; height: 95vh; justify-content: center; align-items: center;">
+    <!-- Contenedor principal -->
+    <div
+        style="display: flex; border-radius: 20px; overflow: hidden; width: 70%; max-width: 80%; height: 60vh; padding: 30px; background-color: #a0d8b3;  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
+
+        <!-- Columna izquierda -->
+        <div
+            style="background-color: blue; color: white; flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; text-align: center;">
+            <!-- Imagen centrada -->
+            <img src="{{ url_for('static', filename='login.png') }}"
+                style="max-width: 50%; height: auto; object-fit: contain; margin-bottom: 20px;">
+            <h2>¡Bienvenido Nuevamente!</h2>
+            <p style="font-family: Lucida Console;">Si aún no tienes una cuenta por favor regístrate aquí</p>
+            <a href="Registro">
+                <button type="button" class="btn btn-success">Registrarse</button>
+            </a>
+        </div>
+
+
+        <!-- Columna derecha -->
+        <div
+            style="background-color: #a0d8b3; flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+            <h2>Iniciar Sesión</h2>
+            <button type="button" class="btn btn-light"
+                style="width: 100%; max-width: 400px; height: 45px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                <!-- Logo de Google  -->
+                <img src="{{ url_for('static', filename='logoGoogle.png') }}" alt="Google Logo"
+                    style="width: 20px; margin-right: 10px;">
+                Iniciar con Google
+            </button>
+
+
+            <p>o Iniciar Sesión con una cuenta</p>
+            <form style="width: 100%; max-width: 400px;">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Correo electrónico" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Contraseña" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                </div>
+                <button type="button" class="btn btn-primary"
+                    style="width: 100%; max-width: 400px; height: 45px;">Iniciar Sesión</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
