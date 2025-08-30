@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block titulo %} CONTACTOS {% endblock titulo %}
+
+{% block  body %}
+    <h1> formulario de contactos </h1>
+
+{% if user %}
+<li><b>Nombre:</b>{{user.nombre}}</li>
+<li><b>Email:</b>{{user.email}}</li>
+<li><b>Mensaje:</b>{{user.mensaje}}</li>
+{% endif %}
+
+
+
+
+
+<form action ='' method='get'>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" >
+    <br>
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email">
+    <br>
+    
+    <label for="mensaje">Mensaje:</label>
+    <textarea id="mensaje" name="mensaje"></textarea>
+    <br>
+    
+    <button type="submit">Enviar</button>
+{% endblock  %}

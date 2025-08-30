@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Prueba{% endblock title %}
+{% block body %}
+
+<head>
+    <link rel="icon" href="/static/icono.png" type="image/png">
+</head>
+
+
+
+<!-- Contenedor principal encabezado-->
+<div class="container-fluid p-5 bg-primary text-white text-center">
+    <h1>Mi primera pagina con Bootstrap</h1>
+    <p>cambie el efecto de esta pagina!</p>
+</div>
+<!-- Contenedor de columnas pie de pagina -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>Columna 1</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>Columna 2</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>Columna 3</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        </div>
+    </div>
+</div>
+<!-- Pie de página -->
+<hr>
+<style>
+    a.text-white:hover {
+        color: #0d6efd !important;
+        /* Cambia este color por el que prefieras */
+        text-decoration: underline;
+    }
+</style>
+<footer>
+    <div class="container mt-5 bg-dark text-white">
+        <div class="row">
+            <div class="col-sm-6">
+                <h5>APP</h5>
+                <p>
+                    <a href="https://www.youtube.com/" target="_blank" class="text-white">YouTube</a>
+                </p>
+                <p>
+                    <a href="https://www.facebook.com/" target="_blank" class="text-white">Facebook</a>
+                </p>
+            </div>
+            <div class="col-sm-6">
+                <h5>RECURSOS</h5>
+                <a href=""></a>
+                <p>Acerca de...</p>
+                <p>Contactos</p>
+            </div>
+        </div>
+    </div>
+    <!-- Pie de página derechos de autor -->
+    <div class="container mt-5 bg-light">
+        <p class="text-center">Copyright © 2025 - UNAN Managua</p>
+    </div>
+</footer>
+{% endblock %}
