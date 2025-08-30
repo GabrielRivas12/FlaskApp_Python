@@ -2,69 +2,184 @@
 {% block title %}Prueba{% endblock title %}
 {% block body %}
 
-<head>
-    <link rel="icon" href="/static/icono.png" type="image/png">
-</head>
+<div class="d-flex flex-column" style="min-height: 100vh; background-color: #e9e9e9;">
 
-
-
-<!-- Contenedor principal encabezado-->
-<div class="container-fluid p-5 bg-primary text-white text-center">
-    <h1>Mi primera pagina con Bootstrap</h1>
-    <p>cambie el efecto de esta pagina!</p>
-</div>
-<!-- Contenedor de columnas pie de pagina -->
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-sm-4">
-            <h3>Columna 1</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+                aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                aria-label="Slide 3"></button>
         </div>
-        <div class="col-sm-4">
-            <h3>Columna 2</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="5000">
+                <img src="{{ url_for('static', filename='imagen1.png') }}" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item" data-bs-interval="5000">
+                <img src="{{ url_for('static', filename='imagen2.png') }}" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item" data-bs-interval="5000">
+                <img src="{{ url_for('static', filename='imagen3.png') }}" class="d-block w-100" alt="...">
+            </div>
         </div>
-        <div class="col-sm-4">
-            <h3>Columna 3</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+
+    <!-- Contenedor principal encabezado-->
+    <div class="container-fluid p-5 text-white text-center" style="background-color: #e9e9e9;">
+        <h1 style="color: #000000;">INFORMACIÓN</h1>
+    </div>
+
+    <!-- Contenedor de columnas pie de pagina -->
+    <div class="container mt-5">
+        <div class="row g-4"> <!-- Usamos g-4 para el espaciado entre columnas -->
+            <div class="col-md-4">
+                <div class="border shadow p-3 mb-5 bg-body rounded">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border shadow p-3 mb-5 bg-body rounded">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border shadow p-3 mb-5 bg-body rounded">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-<!-- Pie de página -->
-<hr>
-<style>
-    a.text-white:hover {
-        color: #0d6efd !important;
-        /* Cambia este color por el que prefieras */
-        text-decoration: underline;
-    }
-</style>
-<footer>
-    <div class="container mt-5 bg-dark text-white">
+
+
+
+    <!-- Contenedor principal encabezado-->
+    <div class="container-fluid p-2 text-white text-center" style="background-color: #e9e9e9;">
+        <h1 style="color: #000000;">SERVICIOS</h1>
+    </div>
+
+    <!-- Contenedor de columnas pie de pagina -->
+    <div class="container mt-5 pb-5" style="background-color: #e9e9e9;">
         <div class="row">
-            <div class="col-sm-6">
-                <h5>APP</h5>
-                <p>
-                    <a href="https://www.youtube.com/" target="_blank" class="text-white">YouTube</a>
-                </p>
-                <p>
-                    <a href="https://www.facebook.com/" target="_blank" class="text-white">Facebook</a>
-                </p>
+            <div class="col-sm-4">
+                <div class="card shadow" style="width: 25rem; height: 600px;">
+                    <div style="border-radius: 80%;">
+                        <img src="{{ url_for('static', filename='venta.png') }}" class="card-img-top" alt="..."
+                            style="border-radius: 100%;">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Ventas</h5>
+                        <p class="card-text">This is longer card with supporting test bellow as a natural lead-in to
+                            additional content. The content is a little bit longer</p>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <button class="btn btn-outline-success" type="submit"
+                            style=" padding: 0.3rem 1rem; width: 100px; height: 40px;">Ver mas...</button>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-6">
-                <h5>RECURSOS</h5>
-                <a href=""></a>
-                <p>Acerca de...</p>
-                <p>Contactos</p>
+
+            <div class="col-sm-4 ">
+                <div class="card shadow" style="width: 25rem;  height: 600px;">
+                    <div style="border-radius: 80%;">
+                        <img src="{{ url_for('static', filename='producto.png') }}" class="card-img-top" alt="..."
+                            style="border-radius: 200%;">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Productos</h5>
+                        <p class="card-text">This is a short card</p>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <button class="btn btn-outline-success" type="submit"
+                            style=" padding: 0.3rem 1rem; width: 100px; height: 40px;">Ver mas...</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card shadow" style="width: 25rem;  height: 600px;">
+                    <div style="border-radius: 80%;">
+                        <img src="{{ url_for('static', filename='carrito.png') }}" class="card-img-top" alt="..."
+                            style="border-radius: 100%;">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Carrito</h5>
+                        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
+                            additional content.</p>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <button class="btn btn-outline-success" type="submit"
+                            style=" padding: 0.3rem 1rem; width: 100px; height: 40px;">Ver mas...</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Pie de página derechos de autor -->
-    <div class="container mt-5 bg-light">
-        <p class="text-center">Copyright © 2025 - UNAN Managua</p>
-    </div>
-</footer>
-{% endblock %}
+
+
+    <!-- Pie de página -->
+    <style>
+        /* Estilo para el hover de los enlaces */
+        a.text-white:hover {
+            color: #17181a !important;
+            text-decoration: underline;
+        }
+
+        /* Estilo para cambiar el color del texto en el footer */
+        .footer-text {
+            color: #a9a9a8;
+            /* Cambia este valor al color que prefieras */
+        }
+    </style>
+
+
+
+    <footer style="margin-top: auto; width: 100%; height: 60%; background-color: #000;">
+        <div class="container mt-5 text-white" style="padding: 50px;">
+            <div class="row">
+                <!-- Columna 1 -->
+                <div class="col-sm-3">
+                    <h5>APP SYSTEM</h5>
+                    <p class="footer-text">Juigalpa, Chontales</p>
+                    <p class="footer-text">Nicaragua</p>
+                </div>
+                <!-- Columna 2 -->
+                <div class="col-sm-3">
+                    <h5>Cursos</h5>
+                    <p class="footer-text">Acerca de...</p>
+                    <p class="footer-text">Python</p>
+                    <p class="footer-text">JavaScript</p>
+                    <p class="footer-text">Bootstrap</p>
+                </div>
+                <!-- Columna 3 -->
+                <div class="col-sm-3">
+                    <h5>Links</h5>
+                    <p class="footer-text">Terms & Conditions</p>
+                </div>
+                <!-- Columna 4 -->
+                <div class="col-sm-3">
+                    <h5>Contactos</h5>
+                    <p class="footer-text">Facebook</p>
+                    <p class="footer-text">Instagram</p>
+                </div>
+                <hr>
+                <p class="text-center"> © Copyright - All rigths reserver 2025</p>
+            </div>
+        </div>
+    </footer>
+</div>
+<div {% endblock %}
