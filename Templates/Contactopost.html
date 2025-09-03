@@ -13,14 +13,20 @@
                 <div class="card-body">
 
                     {% if user %}
-                        <ul class="list-group mb-4">
-                            <li class="list-group-item"><b>Nombre:</b> {{ user.nombre }}</li>
-                            <li class="list-group-item"><b>Email:</b> {{ user.email }}</li>
-                            <li class="list-group-item"><b>Mensaje:</b> {{ user.mensaje }}</li>
-                        </ul>
+
+                        <div class="card mb-4 border-success">
+                            <div class="card-header bg-success text-white">
+                                <strong>Datos enviados</strong>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><b>Nombre:</b> {{ user.nombre }}</li>
+                                <li class="list-group-item"><b>Email:</b> {{ user.email }}</li>
+                                <li class="list-group-item"><b>Mensaje:</b> {{ user.mensaje }}</li>
+                            </ul>
+                        </div>
                     {% endif %}
 
-                    <form action="" method="get">
+                    <form action="" method="post">
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre:</label>
                             <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Tu nombre">
