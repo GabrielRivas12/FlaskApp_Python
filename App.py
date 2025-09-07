@@ -4,6 +4,8 @@ from flask_mysqldb import MySQL
 
 app=Flask(__name__)
 
+app.secret_key = 'appsecretkey' #clave secreta para la sesion
+
 mysql=MySQL() #inicializa la conexion a la DB
 
 # conexion a la DB
@@ -21,15 +23,18 @@ mysql.init_app(app) #inicializa la conexion a la DB
 def home():
     return render_template('index.html')
 
-@app.route('accesologin', methods=['GET', 'POST'])
+@app.route('/admin')  
+def administrador():
+    return render_template('admin.html')
+
+@app.route('/accesologin', methods=['GET', 'POST'])
 def accesologin():
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
         email = request.form['email']
         password = request.form['password']
 
-        # conexion a la base de datos
         cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM usuarios WHERE email = %s AND password = %s', (email, password))
+        cursor.execute('SELECT * FROM usuario WHERE email = %s AND password = %s', (email, password))
         user = cursor.fetchone()
         cursor.close()
 
@@ -38,10 +43,49 @@ def accesologin():
             if user['id_rol'] == 1:
                 return render_template('admin.html')
             elif user['id_rol'] == 2:
-                return render_template('usuario.html')
-        else:
-            return 'Incorrect username/password!'
-        return render_template('Login.html')
+                return render_template('index.html')
+            else:
+            
+                pass
+
+        # Si usuario no encontrado o contraseña incorrecta, muestra login con error
+        return render_template('login.html', error='Credenciales incorrectas')
+
+    
+    return render_template('login.html')
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Validar que las contraseñas coincidan
+        if password != confirm_password:
+            return render_template('Registro.html', error='Las contraseñas no coinciden')
+
+        cursor = mysql.connection.cursor()
+
+        # Verificar que no exista un usuario con ese email
+        cursor.execute('SELECT * FROM usuario WHERE email = %s', (email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            cursor.close()
+            return render_template('Registro.html', error='El correo ya está registrado')
+
+        # Insertar nuevo usuario (id_rol por defecto 2)
+        cursor.execute('INSERT INTO usuario (nombre, email, password, id_rol) VALUES (%s, %s, %s, %s)',
+                       (nombre, email, password, 2))
+        mysql.connection.commit()
+        cursor.close()
+
+        return redirect(url_for('login'))
+
+    # Si es GET solo mostrar el formulario
+    return render_template('Registro.html')
 
 @app.route('/inicio')  # Decorador de la ruta principal
 def inicio():
@@ -73,9 +117,8 @@ def about():
 def login():
     return render_template('Login.html')
 
-@app.route('/Registro') # 
-def Registro():
-    return render_template('Registro.html') 
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000) #ejecuta la aplicacion en modo depuracion

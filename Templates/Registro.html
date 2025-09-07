@@ -8,11 +8,12 @@
     <div class="p-4 w-100" style="max-width: 1100px;">
         <div class="rounded-5 shadow-lg p-4" style="background-color: #a0d8b3;">
             <div class="row g-0">
-                
+
                 <!-- Columna izquierda -->
-                <div class=" rounded-5 col-md-6 d-flex flex-column justify-content-center align-items-center text-white p-4" style="background-color: blue;">
-                    <img src="{{ url_for('static', filename='login.png') }}" 
-                         class="img-fluid mb-3" style="max-width: 50%; height: auto; object-fit: contain;">
+                <div class=" rounded-5 col-md-6 d-flex flex-column justify-content-center align-items-center text-white p-4"
+                    style="background-color: blue;">
+                    <img src="{{ url_for('static', filename='login.png') }}" class="img-fluid mb-3"
+                        style="max-width: 50%; height: auto; object-fit: contain;">
                     <h2 class="text-center">¡Bienvenido!</h2>
                     <p class="text-center" style="font-family: 'Lucida Console', monospace;">
                         Ingresar información de registro
@@ -27,35 +28,43 @@
                     <h2>Bienvenidos</h2>
 
                     <!-- Botón Google -->
-                    <button type="button" class="btn btn-light w-100 d-flex align-items-center justify-content-center mb-3" style="max-width: 400px; height: 45px;">
-                        <img src="{{ url_for('static', filename='logoGoogle.png') }}" alt="Google Logo" style="width: 20px; margin-right: 10px;">
+                    <button type="button"
+                        class="btn btn-light w-100 d-flex align-items-center justify-content-center mb-3"
+                        style="max-width: 400px; height: 45px;">
+                        <img src="{{ url_for('static', filename='logoGoogle.png') }}" alt="Google Logo"
+                            style="width: 20px; margin-right: 10px;">
                         Iniciar con Google
                     </button>
 
                     <p class="text-center">o usar tu email para registrarte</p>
 
                     <!-- Formulario -->
-                    <form class="w-100" style="max-width: 400px;">
+                   <form action="{{ url_for('registro') }}" method="POST" class="w-100" style="max-width: 400px;">
                         <div class="mb-3">
-                            <input type="text" class="form-control" placeholder="Nombre completo" aria-label="nombrecompleto">
+                            <input type="text" name="nombre" class="form-control" placeholder="Nombre completo"
+                                aria-label="nombrecompleto" required>
                         </div>
 
                         <div class="mb-3">
-                            <input type="email" class="form-control" placeholder="Correo electrónico" aria-label="correo">
+                            <input type="email" name="email" class="form-control" placeholder="Correo electrónico"
+                                aria-label="correo" required>
                         </div>
 
                         <div class="mb-3">
-                            <input type="password" class="form-control" placeholder="Contraseña" aria-label="contraseña">
+                            <input type="password" name="password" class="form-control" placeholder="Contraseña"
+                                aria-label="contraseña" required>
                         </div>
 
                         <div class="mb-3">
-                            <input type="password" class="form-control" placeholder="Confirmar contraseña" aria-label="confirmar">
+                            <input type="password" name="confirm_password" class="form-control"
+                                placeholder="Confirmar contraseña" aria-label="confirmar" required>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100" style="height: 45px;">
                             Registrarse
                         </button>
                     </form>
+
                 </div>
 
             </div>

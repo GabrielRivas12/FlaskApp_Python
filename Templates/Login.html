@@ -4,25 +4,27 @@
 
 {% block body %}
 <div class="d-flex justify-content-center align-items-center vh-100" style="background-color: #d5eadc;">
-    
+
     <div class="p-4 w-100" style="max-width: 1100px;">
         <div class="rounded-5 shadow-lg p-4" style="background-color: #a0d8b3;">
 
             <div class="row g-0">
                 <!-- Columna Izquierda -->
-                <div class=" rounded-5 col-md-6 d-flex flex-column justify-content-center align-items-center text-white p-4" style="background-color: blue;">
-                    <img src="{{ url_for('static', filename='login.png') }}" 
-                         class="img-fluid mb-3" style="max-width: 50%; height: auto; object-fit: contain;">
+                <div class=" rounded-5 col-md-6 d-flex flex-column justify-content-center align-items-center text-white p-4"
+                    style="background-color: blue;">
+                    <img src="{{ url_for('static', filename='login.png') }}" class="img-fluid mb-3"
+                        style="max-width: 50%; height: auto; object-fit: contain;">
                     <h2 class="text-center">¡Bienvenido Nuevamente!</h2>
                     <p class="text-center" style="font-family: 'Lucida Console', monospace;">
                         Si aún no tienes una cuenta por favor regístrate aquí
                     </p>
-                    <a href="Registro">
-                        <button type="button" class="btn btn-success mt-2" 
-                                style="background: linear-gradient(90deg, #0dc9bd, #02cf4a);">
+                    <a href="{{ url_for('registro') }}">
+                        <button type="button" class="btn btn-success mt-2"
+                            style="background: linear-gradient(90deg, #0dc9bd, #02cf4a);">
                             Registrarse
                         </button>
                     </a>
+
                 </div>
 
                 <!-- Columna Derecha -->
@@ -30,27 +32,34 @@
                     <h2>Iniciar Sesión</h2>
 
                     <!-- Botón Google -->
-                    <button type="button" class="btn btn-light w-100 d-flex align-items-center justify-content-center mb-3" style="max-width: 400px; height: 45px;">
-                        <img src="{{ url_for('static', filename='logoGoogle.png') }}" alt="Google Logo" style="width: 20px; margin-right: 10px;">
+                    <button type="button"
+                        class="btn btn-light w-100 d-flex align-items-center justify-content-center mb-3"
+                        style="max-width: 400px; height: 45px;">
+                        <img src="{{ url_for('static', filename='logoGoogle.png') }}" alt="Google Logo"
+                            style="width: 20px; margin-right: 10px;">
                         Iniciar con Google
                     </button>
 
                     <p class="text-center">o Iniciar Sesión con una cuenta</p>
 
                     <!-- Formulario -->
-                    <form action='accesologin' class="w-100" style="max-width: 400px;">
+                    <form action="{{ url_for('accesologin') }}" method="POST" class="w-100" style="max-width: 400px;">
                         <div class="mb-3">
-                            <input type="text" class="form-control" placeholder="Correo electrónico">
+                            <input type="text" name="email" class="form-control" placeholder="Correo electrónico"
+                                required>
                         </div>
 
                         <div class="mb-3">
-                            <input type="password" class="form-control" placeholder="Contraseña">
+                            <input type="password" name="password" class="form-control" placeholder="Contraseña"
+                                required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100" style="height: 45px; background: linear-gradient(90deg, #21cfff,#6d29ff,#0b66b5,#cf4dff);">
+                        <button type="submit" class="btn btn-primary w-100"
+                            style="height: 45px; background: linear-gradient(90deg, #21cfff,#6d29ff,#0b66b5,#cf4dff);">
                             Iniciar Sesión
                         </button>
                     </form>
+
                 </div>
             </div>
 
