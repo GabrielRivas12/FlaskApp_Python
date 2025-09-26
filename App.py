@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 
 
@@ -23,9 +23,21 @@ mysql.init_app(app) #inicializa la conexion a la DB
 def home():
     return render_template('index.html')
 
+@app.route('/logout')
+def logout():
+    return redirect(url_for('inicio'))
+
 @app.route('/admin')  
 def administrador():
     return render_template('admin.html')
+
+@app.route('/listar')
+def listar():
+    return render_template('listar')
+
+@app.route('/agregar')
+def agregar():
+    return render_template('agregar')
 
 @app.route('/accesologin', methods=['GET', 'POST'])
 def accesologin():
@@ -44,15 +56,12 @@ def accesologin():
                 return render_template('admin.html')
             elif user['id_rol'] == 2:
                 return render_template('index.html')
-            else:
-            
-                pass
+        else:
+            flash('Usuario y contraseña incorrectos', 'danger')
+            return render_template('Login.html', error='Usuarios y contraseña incorrectos')  # Asegúrate que se llama Login.html
 
-        # Si usuario no encontrado o contraseña incorrecta, muestra login con error
-        return render_template('login.html', error='Credenciales incorrectas')
+    return render_template('Login.html')
 
-    
-    return render_template('login.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():

@@ -1,1 +1,123 @@
-<h1> este es el admin</h1>
+{% extends 'baseadmin.html' %}
+{% block title %}Panel de Administración{% endblock %}
+{% block body %}
+
+    
+<!--MENSAJE DE ALERTA SweetAlert2 CONFIRMACION-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+    {% for category, message in messages %}
+    <script type="text/javascript">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "{{message}}"
+        });
+    </script>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<!--MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2-->
+<script>
+    function confirmarEliminacion(url) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+<div class="container p-5 mt-3">
+    <h2 class=" text-center alert alert-danger py-4">Sistema de Gestión de Productos</h2>
+    <div class="row">
+        <div class="row text-center">
+            <div class="col-sm-4 mb-3 mb-sm-0">
+                <div class="card" style="background: linear-gradient(180deg, #355e3b, #7a9f7a, #f1eeda);">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="card-body text-white">
+
+                                    <h5 class="card-title">Perfil del Usuario</h5>
+                                    <!-- p class="card-text">Mostrar registro de usuarios</p> -->
+                                    <a href="{{ url_for('listar')}}" class="btn btn-outline-success">Ver
+                                        Detalles</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 align-content-center">
+                            <img src="{{ url_for('static', filename='usuarios.png') }}" class="img-fluid rounded-start"
+                                alt="Agregar Usuario ...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-3 mb-sm-0">
+                <div class="card" style="background: linear-gradient(180deg, #042bf1,#367cd9,#ffffff);">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="card-body text-white">
+                                    <h5 class="card-title">Registrar Productos</h5>
+                                    <!-- <p class="card-text">Agregar los productos al sistema</p> -->
+                                    <a href="{{ url_for('listar') }}"
+                                        class="btn btn-outline-success">Ver
+                                        Detalles</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 align-content-center">
+                            <a href="{{ url_for('agregar') }}">
+                                <img src="{{ url_for('static', filename='agregarproductos.png') }}"
+                                    class="img-fluid rounded-start" alt="..."></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-3 mb-sm-0">
+                <div class="card" style="background: linear-gradient(180deg, #0b235c,#3d85a9,#e0f7ff);">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="card-body text-white">
+                                    <h5 class="card-title">Visualizar Productos</h5>
+                                    <!-- <p class="card-text">Muestra lista de productos</p> -->
+                                    <a href="{{ url_for('listar') }}" class="btn btn-outline-success">Ver
+                                        Detalles</a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 align-content-center">
+                            <img src="{{ url_for('static', filename='listarproductos.png') }}"
+                                class="img-fluid rounded-start" alt="...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

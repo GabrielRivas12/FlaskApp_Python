@@ -3,6 +3,20 @@
 {% block titulo %} Login Page {% endblock titulo %}
 
 {% block body %}
+
+{% with msg = get_flashed_messages(with_categories=true) %}
+  {% if msg %}
+    {% for category, message in msg %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+
 <div class="d-flex justify-content-center align-items-center vh-100" style="background-color: #d5eadc;">
 
     <div class="p-4 w-100" style="max-width: 1100px;">
@@ -50,14 +64,27 @@
                         </div>
 
                         <div class="mb-3">
-                            <input type="password" name="password" class="form-control" placeholder="Contraseña"
-                                required>
+                            <input type="password" name="password" class="form-control" placeholder="Contraseña">
                         </div>
+
 
                         <button type="submit" class="btn btn-primary w-100"
                             style="height: 45px; background: linear-gradient(90deg, #21cfff,#6d29ff,#0b66b5,#cf4dff);">
                             Iniciar Sesión
                         </button>
+
+                        {% if error %}
+                        <div class="alert alert-danger mt-3" role="alert">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+
+
+
+
+
+
+
                     </form>
 
                 </div>
