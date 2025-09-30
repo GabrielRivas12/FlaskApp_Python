@@ -1,0 +1,164 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Lista usuarios {% endblock titulo %}
+
+{% block body %}
+
+<!--MENSAJE DE ALERTA SweetAlert2 CONFIRMACION-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+    {% for category, message in messages %}
+    <script type="text/javascript">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "{{message}}"
+        });
+    </script>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<!--MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2-->
+<script>
+    function confirmarEliminacion(url) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+
+<div class="container mt-4">
+
+    <!-- Botón Agregar Usuario -->
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-success" onclick="toggleForm()">Agregar Usuario</button>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="bg-success bg-gradient text-white rounded p-3 mb-3 shadow-sm">
+        <h2 class="text-center">Lista de Usuarios</h2>
+    </div>
+
+    <!-- Formulario Agregar Usuario -->
+    <div id="formAgregar" class="card p-3 mt-3 d-none">
+        <form method="POST" action="{{ url_for('agregar_usuario') }}">
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="email" name="email" class="form-control" placeholder="Correo" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="password" class="form-control" placeholder="Contraseña" required>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleForm()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById('formAgregar');
+            form.classList.toggle('d-none');
+        }
+    </script>
+
+    <!-- Tabla -->
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">N°</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Password</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ usuario.nombre }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td>{{ usuario.password }}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalEditar{{ usuario.id }}">Editar</button>
+                        <a href="{{ url_for('eliminar_usuario', id=usuario.id) }}" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Eliminar este usuario?')">Eliminar</a>
+                    </td>
+                </tr>
+
+                <!-- Modal de Edición -->
+                <div class="modal fade" id="modalEditar{{ usuario.id }}" tabindex="-1"
+                    aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form method="POST" action="{{ url_for('editar_usuario_modal', id=usuario.id) }}">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title" id="modalLabel{{ usuario.id }}">Editar Usuario</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Nombre</label>
+                                        <input type="text" name="nombre" class="form-control"
+                                            value="{{ usuario.nombre }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Correo</label>
+                                        <input type="email" name="email" class="form-control"
+                                            value="{{ usuario.email }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Contraseña</label>
+                                        <input type="text" name="password" class="form-control"
+                                            value="{{ usuario.password }}" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

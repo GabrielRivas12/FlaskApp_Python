@@ -1,0 +1,91 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Lista de Productos {% endblock titulo %}
+
+{% block body %}
+
+<div class="container mt-4">
+
+    <!-- Encabezado -->
+    <div class="bg-danger bg-gradient text-white rounded p-3 mb-3 shadow-sm">
+        <h2 class="text-center">Lista de Producto</h2>
+    </div>
+
+    <!-- Botones de Exportación (sin funciones) -->
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-clipboard"></i></button>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-excel"></i></button>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-pdf"></i></button>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i></button>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.precio }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>
+                        <!-- Botón Editar -->
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ producto.id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <!-- Botón Eliminar -->
+                        <a href="{{ url_for('eliminar_producto', id=producto.id) }}" class="btn btn-danger btn-sm"
+                           onclick="return confirm('¿Seguro que deseas eliminar este producto?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Modal de Edición -->
+                <div class="modal fade" id="modalEditar{{ producto.id }}" tabindex="-1" aria-labelledby="modalLabel{{ producto.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form method="POST" action="{{ url_for('editar_producto_modal', id=producto.id) }}">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title" id="modalLabel{{ producto.id }}">Editar Producto</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Nombre</label>
+                                        <input type="text" name="nombre" class="form-control" value="{{ producto.nombre }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Precio</label>
+                                        <input type="number" step="0.01" name="precio" class="form-control" value="{{ producto.precio }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Descripción</label>
+                                        <textarea name="descripcion" class="form-control" required>{{ producto.descripcion }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

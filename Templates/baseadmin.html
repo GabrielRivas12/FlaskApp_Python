@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
 
+
+
 <head>
     <title>{% block title %} {% endblock title %}</title>
     <!-- Required meta tags -->
@@ -25,8 +27,7 @@ icons.min.css">
 <body class="bg-success bg-opacity-10">
     <header>
         <!-- place navbar here -->
-        <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark"
-           >
+        <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
             <div class="container">
                 <a class="navbar-brand" href="#">Sistema</a>
 
@@ -49,9 +50,8 @@ icons.min.css">
                                 Productos
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item"
-                                        href="{{ url_for('agregar') }}">Agregar</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('listar') }}">Listar</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('productos') }}">Agregar</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('editar') }}">Listar</a></li>
                                 <li><a class="dropdown-item" href="#"></a></li>
                             </ul>
                         </li>
@@ -62,11 +62,9 @@ icons.min.css">
                             <a class="nav-link" href="{{ url_for('listar') }}"></a>
                         </li>
                     </ul>
-                    <!-- Mostrar nombre de usuario registrado -->
 
                     {% if session['nombre'] %}
                     <span class="navbar-text text-light ms-2">
-                        <!-- Bienvenido: -->
                         {{ session['nombre'] }}
                     </span>
                     {% endif %}

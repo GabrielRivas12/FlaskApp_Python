@@ -1,8 +1,118 @@
 {% extends "baseadmin.html" %}
 
-{% block titulo %} CONTACTOS {% endblock titulo %}
+{% block titulo %} Lista de Productos {% endblock titulo %}
 
 {% block body %}
-<h1> lista de productos</h1>
 
+<!--MENSAJE DE ALERTA SweetAlert2 CONFIRMACION-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+    {% for category, message in messages %}
+    <script type="text/javascript">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "{{message}}"
+        });
+    </script>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<!--MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2-->
+<script>
+    function confirmarEliminacion(url) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+
+<div class="container mt-4">
+
+    <div class="row">
+        <!-- Formulario para agregar producto -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-3" style="background-color: #ffffff;">
+                <!-- Encabezado -->
+                <div class="card-header text-white fw-bold text-center" style="background-color: #e21313;">
+                    Agregar Producto
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('agregar_producto') }}">
+
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre del Producto</label>
+                            <input type="text" class="form-control" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" step="0.01" class="form-control" name="precio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-outline-success w-100">Agregar Producto</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Tabla de productos -->
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white text-center fw-bold">
+                    Lista de Productos
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-center align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto.id }}</td>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.precio }}</td>
+                                <td>{{ producto.descripcion }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
