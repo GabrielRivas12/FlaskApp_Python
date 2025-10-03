@@ -1,0 +1,20 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Perfil de Usuario {% endblock titulo %}
+
+{% block body %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg" style="width: 100%; max-width: 500px;">
+        <div class="card-header text-center bg-primary text-white">
+            <h3>Perfil de Usuario</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Nombre: Gabriel</strong> {{ nombre }}</p>
+            <p><strong>Email: Gabriel@gmail.com</strong> {{ email }}</p>
+            <p><strong>Contraseña:</strong> ********</p>
+            <div class="text-center mt-4">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

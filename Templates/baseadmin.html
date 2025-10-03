@@ -56,10 +56,10 @@ icons.min.css">
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('listar') }}">Perfil</a>
+                            <a class="nav-link" href="{{ url_for('perfilusuario') }}">Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('listar') }}"></a>
+                            <a class="nav-link" href="{{ url_for('perfilusuario') }}"></a>
                         </li>
                     </ul>
 
@@ -77,10 +77,37 @@ icons.min.css">
         {% block body %}
         {% endblock %}
     </main>
-    <footer>
-        <hr>
-        <div class="container bg-light">
-            <p class="text-center">Copyright © 2025 - UNAN Managua</p>
+     <footer style="margin-top: auto; width: 100%; height: 60%; background-color: #000;">
+        <div class="container mt-5 text-white" style="padding: 50px;">
+            <div class="row">
+                <!-- Columna 1 -->
+                <div class="col-sm-3">
+                    <h5>APP SYSTEM</h5>
+                    <p class="footer-text">Juigalpa, Chontales</p>
+                    <p class="footer-text">Nicaragua</p>
+                </div>
+                <!-- Columna 2 -->
+                <div class="col-sm-3">
+                    <h5>Cursos</h5>
+                    <p class="footer-text">Python</p>
+                    <p class="footer-text">JavaScript</p>
+                    <p class="footer-text">Bootstrap</p>
+                </div>
+                <!-- Columna 3 -->
+                <div class="col-sm-3">
+                    <h5>Links</h5>
+                    <p class="footer-text">Terms & Conditions</p>
+                </div>
+                <!-- Columna 4 -->
+                <div class="col-sm-3">
+                    <h5>Contactos</h5>
+                    <p class="footer-text"><i class="fab fa-facebook"></i> Facebook</p>
+                    <p class="footer-text"><i class="fab fa-instagram"></i> Instagram</p>
+                </div>
+
+                <hr>
+                <p class="text-center"> © Copyright - All rigths reserver 2025</p>
+            </div>
         </div>
     </footer>
     <!-- Bootstrap JavaScript Libraries -->

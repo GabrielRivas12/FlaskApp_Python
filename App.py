@@ -18,7 +18,6 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql.init_app(app) #inicializa la conexion a la DB
 
-
 @app.route('/')  # Decorador de la ruta principal
 def home():
     return render_template('index.html')
@@ -63,8 +62,6 @@ def editar_usuario_modal(id):
     flash('Usuario actualizado correctamente', 'success')
     return redirect(url_for('listar'))
 
-
-
 @app.route('/agregar_usuario', methods=['POST'])
 def agregar_usuario():
     nombre = request.form['nombre']
@@ -79,7 +76,6 @@ def agregar_usuario():
 
     flash('Usuario agregado correctamente', 'success')
     return redirect(url_for('listar'))
-
 
 @app.route('/productos')
 def productos():
@@ -138,6 +134,9 @@ def editar_producto_modal(id):
     flash('Producto actualizado correctamente', 'success')
     return redirect(url_for('editar'))
 
+@app.route('/perfilusuario')
+def perfilusuario():
+    return render_template('perfilusuario.html')
 
 
 @app.route('/accesologin', methods=['GET', 'POST'])
@@ -226,9 +225,6 @@ def about():
 @app.route('/login') # 
 def login():
     return render_template('Login.html')
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000) #ejecuta la aplicacion en modo depuracion
