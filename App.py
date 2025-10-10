@@ -102,11 +102,81 @@ def agregar_producto():
 
 @app.route('/editar')
 def editar():
+    page = request.args.get('page', 1, type=int)
+    buscar = request.args.get('buscar', '')
+    
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM productos")
-    productos = cursor.fetchall()
+    
+    # Construir la consulta base
+    if buscar:
+        query = 'SELECT * FROM productos WHERE nombre LIKE %s ORDER BY id'
+        count_query = 'SELECT COUNT(*) as total FROM productos WHERE nombre LIKE %s'
+        params = (f'%{buscar}%',)
+    else:
+        query = 'SELECT * FROM productos ORDER BY id'
+        count_query = 'SELECT COUNT(*) as total FROM productos'
+        params = ()
+    
+    # Obtener el total de productos
+    cursor.execute(count_query, params)
+    total_result = cursor.fetchone()
+    total = total_result['total'] if total_result else 0
+    
+    # Calcular paginación - CAMBIADO A 5 PRODUCTOS POR PÁGINA
+    per_page = 5  # Solo 5 productos por página para probar
+    pages = (total + per_page - 1) // per_page  # Cálculo de páginas totales
+    
+    # Calcular offset
+    offset = (page - 1) * per_page
+    
+    # Consulta con paginación
+    if buscar:
+        query += ' LIMIT %s OFFSET %s'
+        cursor.execute(query, (f'%{buscar}%', per_page, offset))
+    else:
+        query += ' LIMIT %s OFFSET %s'
+        cursor.execute(query, (per_page, offset))
+    
+    productos_list = cursor.fetchall()
     cursor.close()
-    return render_template("editarproductos.html", productos=productos)
+    
+    # DEBUG: Verificar en consola
+    print(f"DEBUG - Página: {page}, Total: {total}, Páginas: {pages}")
+    print(f"DEBUG - Productos en esta página: {len(productos_list)}")
+    
+    # Crear objeto similar al de paginate de SQLAlchemy
+    class Pagination:
+        def __init__(self, items, page, per_page, total, pages):
+            self.items = items
+            self.page = page
+            self.per_page = per_page
+            self.total = total
+            self.pages = pages
+            self.has_prev = page > 1
+            self.has_next = page < pages
+            self.prev_num = page - 1 if page > 1 else None
+            self.next_num = page + 1 if page < pages else None
+            
+        def iter_pages(self, left_edge=2, left_current=2, right_current=3, right_edge=2):
+            last = 0
+            for num in range(1, self.pages + 1):
+                if (num <= left_edge or 
+                    (num > self.page - left_current - 1 and num < self.page + right_current) or 
+                    num > self.pages - right_edge):
+                    if last + 1 != num:
+                        yield None
+                    yield num
+                    last = num
+    
+    productos_paginados = Pagination(
+        items=productos_list,
+        page=page,
+        per_page=per_page,
+        total=total,
+        pages=pages
+    )
+    
+    return render_template('editarproductos.html', productos=productos_paginados)
 
 
 @app.route('/eliminar_producto/<int:id>')
