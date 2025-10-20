@@ -104,6 +104,7 @@ def agregar_producto():
 def editar():
     page = request.args.get('page', 1, type=int)
     buscar = request.args.get('buscar', '')
+    por_pagina = request.args.get('por_pagina', 5, type=int)  # Nuevo parámetro
     
     cursor = mysql.connection.cursor()
     
@@ -122,8 +123,8 @@ def editar():
     total_result = cursor.fetchone()
     total = total_result['total'] if total_result else 0
     
-    # Calcular paginación - CAMBIADO A 5 PRODUCTOS POR PÁGINA
-    per_page = 5  # Solo 5 productos por página para probar
+    # Calcular paginación - AHORA USANDO EL PARÁMETRO por_pagina
+    per_page = por_pagina
     pages = (total + per_page - 1) // per_page  # Cálculo de páginas totales
     
     # Calcular offset
@@ -141,7 +142,7 @@ def editar():
     cursor.close()
     
     # DEBUG: Verificar en consola
-    print(f"DEBUG - Página: {page}, Total: {total}, Páginas: {pages}")
+    print(f"DEBUG - Página: {page}, Total: {total}, Páginas: {pages}, Por página: {per_page}")
     print(f"DEBUG - Productos en esta página: {len(productos_list)}")
     
     # Crear objeto similar al de paginate de SQLAlchemy
@@ -204,9 +205,6 @@ def editar_producto_modal(id):
     flash('Producto actualizado correctamente', 'success')
     return redirect(url_for('editar'))
 
-@app.route('/perfilusuario')
-def perfilusuario():
-    return render_template('perfilusuario.html')
 
 
 @app.route('/accesologin', methods=['GET', 'POST'])
@@ -222,13 +220,17 @@ def accesologin():
 
         if user:
             session['id_rol'] = user['id_rol']
+            session['user_email'] = user['email']  # <- AGREGAR ESTA LÍNEA
+            session['user_id'] = user['id']        # <- AGREGAR ESTA LÍNEA
+            session['user_nombre'] = user['nombre'] # <- AGREGAR ESTA LÍNEA
+            
             if user['id_rol'] == 1:
                 return render_template('admin.html')
             elif user['id_rol'] == 2:
                 return render_template('index.html')
         else:
             flash('Usuario y contraseña incorrectos', 'danger')
-            return render_template('Login.html', error='Usuarios y contraseña incorrectos')  # Asegúrate que se llama Login.html
+            return render_template('Login.html', error='Usuarios y contraseña incorrectos')
 
     return render_template('Login.html')
 
@@ -265,6 +267,36 @@ def registro():
 
     # Si es GET solo mostrar el formulario
     return render_template('Registro.html')
+
+@app.route('/perfilusuario')
+def perfilusuario():
+    # Verificar si el usuario está logueado
+    if 'id_rol' not in session:
+        flash('Debes iniciar sesión para ver tu perfil', 'warning')
+        return redirect(url_for('login'))
+    
+    # Obtener información del usuario actual desde la base de datos
+    cursor = mysql.connection.cursor()
+    
+    # Obtener el email del usuario de la sesión (necesitas almacenarlo en el login)
+    # Si no tienes el email en sesión, necesitamos modificar el login primero
+    if 'user_email' in session:
+        cursor.execute('SELECT * FROM usuario WHERE email = %s', (session['user_email'],))
+    else:
+        # Si no hay email en sesión, redirigir al login
+        flash('Sesión inválida, por favor inicia sesión nuevamente', 'error')
+        return redirect(url_for('login'))
+    
+    usuario = cursor.fetchone()
+    cursor.close()
+    
+    if usuario:
+        return render_template('perfilusuario.html', 
+                             nombre=usuario['nombre'], 
+                             email=usuario['email'])
+    else:
+        flash('No se pudo encontrar la información del usuario', 'error')
+        return redirect(url_for('inicio'))
 
 @app.route('/inicio')  # Decorador de la ruta principal
 def inicio():

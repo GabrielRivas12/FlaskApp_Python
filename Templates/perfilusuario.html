@@ -3,18 +3,307 @@
 {% block titulo %} Perfil de Usuario {% endblock titulo %}
 
 {% block body %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-lg" style="width: 100%; max-width: 500px;">
-        <div class="card-header text-center bg-primary text-white">
-            <h3>Perfil de Usuario</h3>
-        </div>
-        <div class="card-body">
-            <p><strong>Nombre: Gabriel</strong> {{ nombre }}</p>
-            <p><strong>Email: Gabriel@gmail.com</strong> {{ email }}</p>
-            <p><strong>Contraseña:</strong> ********</p>
-            <div class="text-center mt-4">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Card Principal -->
+            <div class="card shadow-lg border-0">
+                <!-- Header con degradado -->
+                <div class="card-header bg-primary bg-gradient text-white py-4">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="card-title mb-0"><i class="bi bi-person-circle me-2"></i>Perfil de Usuario</h3>
+                        </div>
+                        <div class="col-4 text-end">
+                            <span class="badge bg-light text-dark">
+                                {% if session.id_rol == 1 %}
+                                Administrador
+                                {% else %}
+                                Usuario
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Sección Avatar -->
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <!-- Avatar -->
+                            <div id="avatarPreview" class="avatar-container rounded-circle shadow-sm border">
+                                <img src="{{ url_for('static', filename='img/default-avatar.png') }}" 
+                                     class="avatar-img" 
+                                     >
+                            </div>
+                            
+                            <!-- Botón para cambiar foto -->
+                            <label for="avatarInput" class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 shadow" 
+                                   style="width: 35px; height: 35px; cursor: pointer;">
+                                <i class="bi bi-camera"></i>
+                            </label>
+                            <input type="file" id="avatarInput" accept="image/*" class="d-none">
+                        </div>
+                    </div>
+
+                    <!-- Información del Usuario -->
+                    <div class="row g-3">
+                        <!-- Nombre -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="icon-container bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Nombre completo</small>
+                                    <strong class="text-dark">{{ nombre }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="icon-container bg-success rounded-circle d-flex align-items-center justify-content-center me-3">
+                                    <i class="bi bi-envelope text-white"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Correo electrónico</small>
+                                    <strong class="text-dark">{{ email }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="icon-container bg-warning rounded-circle d-flex align-items-center justify-content-center me-3">
+                                    <i class="bi bi-shield-lock text-white"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Contraseña</small>
+                                    <div class="d-flex align-items-center">
+                                        <strong class="text-dark me-2">••••••••</strong>
+                                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#cambiarPasswordModal">
+                                            <i class="bi bi-pencil"></i> Cambiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rol -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="icon-container bg-info rounded-circle d-flex align-items-center justify-content-center me-3">
+                                    <i class="bi bi-person-badge text-white"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Tipo de usuario</small>
+                                    <strong class="text-dark">
+                                        {% if session.id_rol == 1 %}
+                                        Administrador
+                                        {% else %}
+                                        Usuario Regular
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+                                <i class="bi bi-pencil-square me-2"></i>Editar Perfil
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal Editar Perfil -->
+<div class="modal fade" id="editarPerfilModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Perfil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarPerfil">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" value="{{ nombre }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" value="{{ email }}" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarCambios()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cambiar Contraseña -->
+<div class="modal fade" id="cambiarPasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title"><i class="bi bi-shield-lock me-2"></i>Cambiar Contraseña</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCambiarPassword">
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña actual</label>
+                        <input type="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nueva contraseña</label>
+                        <input type="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar nueva contraseña</label>
+                        <input type="password" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning text-white" onclick="cambiarPassword()">Cambiar Contraseña</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    /* Estilos para el avatar */
+    .avatar-container {
+        width: 120px;
+        height: 120px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e9ecef;
+        border: 3px solid #dee2e6;
+    }
+    
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Estilos para los iconos circulares */
+    .icon-container {
+        width: 45px;
+        height: 45px;
+        flex-shrink: 0;
+    }
+    
+    .icon-container i {
+        font-size: 1.2rem;
+    }
+    
+    /* Efectos de hover */
+    .avatar-container:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+</style>
+
+<script>
+    // Función para cambiar avatar
+    document.getElementById('avatarInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const avatarImg = document.querySelector('.avatar-img');
+                avatarImg.src = e.target.result;
+                
+                // Mostrar mensaje de éxito
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Foto de perfil actualizada"
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Función para guardar cambios del perfil
+    function guardarCambios() {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+        });
+        Toast.fire({
+            icon: "success",
+            title: "Perfil actualizado correctamente"
+        });
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
+        modal.hide();
+    }
+
+    // Función para cambiar contraseña
+    function cambiarPassword() {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+        });
+        Toast.fire({
+            icon: "success",
+            title: "Contraseña cambiada correctamente"
+        });
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('cambiarPasswordModal'));
+        modal.hide();
+    }
+
+    // Inicializar tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 {% endblock %}

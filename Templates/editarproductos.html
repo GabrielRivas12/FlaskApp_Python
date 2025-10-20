@@ -30,25 +30,6 @@
 </ul>
 {% endif %}
 {% endwith %}
-<!--MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2-->
-<script>
-    function confirmarEliminacion(url) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡No podrás revertir esto!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
-        });
-    }
-</script>
 
 <div class="container mt-4">
 
@@ -71,8 +52,25 @@
                     class="bi bi-printer"></i></button>
         </div>
 
-        <!-- Buscador pequeño -->
-        <div class="d-flex align-items-center">
+        <!-- Contenedor para buscador y combo box de cantidad -->
+        <div class="d-flex align-items-center gap-2">
+            <!-- Combo Box para seleccionar cantidad por página -->
+            <form method="GET" action="{{ url_for('editar') }}" class="d-flex align-items-center">
+                <label for="por_pagina" class="form-label mb-0 me-2 small">Mostrar:</label>
+                <select name="por_pagina" id="por_pagina" class="form-select form-select-sm" style="width: 80px;" onchange="this.form.submit()">
+                    <option value="5" {% if request.args.get('por_pagina', '5') == '5' %}selected{% endif %}>5</option>
+                    <option value="10" {% if request.args.get('por_pagina', '5') == '10' %}selected{% endif %}>10</option>
+                    <option value="25" {% if request.args.get('por_pagina', '5') == '25' %}selected{% endif %}>25</option>
+                    <option value="50" {% if request.args.get('por_pagina', '5') == '50' %}selected{% endif %}>50</option>
+                    <option value="100" {% if request.args.get('por_pagina', '5') == '100' %}selected{% endif %}>100</option>
+                </select>
+                <!-- Mantener el parámetro de búsqueda si existe -->
+                {% if request.args.get('buscar') %}
+                <input type="hidden" name="buscar" value="{{ request.args.get('buscar') }}">
+                {% endif %}
+            </form>
+
+            <!-- Buscador pequeño -->
             <form method="GET" action="{{ url_for('editar') }}" class="d-flex">
                 <input type="text" class="form-control form-control-sm me-2" id="buscar" name="buscar"
                     value="{{ request.args.get('buscar', '') }}" placeholder="Buscar producto..." style="width: 200px;">
@@ -84,29 +82,13 @@
                     <i class="bi bi-x-circle"></i>
                 </a>
                 {% endif %}
+                <!-- Mantener el parámetro de cantidad por página si existe -->
+                {% if request.args.get('por_pagina') %}
+                <input type="hidden" name="por_pagina" value="{{ request.args.get('por_pagina') }}">
+                {% endif %}
             </form>
         </div>
     </div>
-
-    <!-- Información de resultados -->
-    {% if request.args.get('buscar') %}
-    <div class="alert alert-info py-2">
-        <small>
-            Resultados para: "<strong>{{ request.args.get('buscar') }}</strong>"
-            | Mostrando <strong>{{ productos.items|length }}</strong> de <strong>{{ productos.total }}</strong> productos
-            | Página <strong>{{ productos.page }}</strong> de <strong>{{ productos.pages }}</strong>
-        </small>
-    </div>
-    {% else %}
-    <div class="alert alert-info py-2 d-flex justify-content-between align-items-center">
-        <small>
-            Mostrando <strong>{{ productos.items|length }}</strong> de <strong>{{ productos.total }}</strong> productos
-        </small>
-        <small>
-            Página <strong>{{ productos.page }}</strong> de <strong>{{ productos.pages }}</strong>
-        </small>
-    </div>
-    {% endif %}
 
     <!-- Tabla de Productos -->
     <div class="table-responsive">
@@ -133,11 +115,12 @@
                             data-bs-target="#modalEditar{{ producto.id }}">
                             <i class="bi bi-pencil"></i> 
                         </button>
-                        <!-- Botón Eliminar -->
-                        <a href="{{ url_for('eliminar_producto', id=producto.id) }}" class="btn btn-danger btn-sm"
-                            onclick="return confirm('¿Seguro que deseas eliminar este producto?')">
+                        <!-- Botón Eliminar - MODIFICADO: Ahora usa SweetAlert -->
+                        <button class="btn btn-danger btn-sm btn-eliminar" 
+                                data-url="{{ url_for('eliminar_producto', id=producto.id) }}"
+                                data-nombre="{{ producto.nombre }}">
                             <i class="bi bi-trash"></i> 
-                        </a>
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -145,14 +128,33 @@
         </table>
     </div>
 
-    <!-- Paginador -->
+    <!-- Información de resultados -->
+    {% if request.args.get('buscar') %}
+    <div class="alert alert-info py-2">
+        <small>
+            Resultados para: "<strong>{{ request.args.get('buscar') }}</strong>"
+            | Página <strong>{{ productos.page }}</strong> de <strong>{{ productos.pages }}</strong>
+        </small>
+    </div>
+    {% else %}
+    <div class="alert alert-info py-2 d-flex justify-content-between align-items-center">
+        <small>
+            Mostrando <strong>{{ productos.items|length }}</strong> de <strong>{{ productos.total }}</strong> productos
+        </small>
+        <small>
+            Página <strong>{{ productos.page }}</strong> de <strong>{{ productos.pages }}</strong>
+        </small>
+    </div>
+    {% endif %}
+
+    <!-- Paginador - MODIFICADO: Alineado a la derecha -->
     {% if productos.pages > 1 %}
     <nav aria-label="Paginación de productos">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination justify-content-end">
             <!-- Botón Anterior -->
             <li class="page-item {% if not productos.has_prev %}disabled{% endif %}">
                 <a class="page-link"
-                    href="{{ url_for('editar', page=productos.prev_num, buscar=request.args.get('buscar', '')) }}"
+                    href="{{ url_for('editar', page=productos.prev_num, buscar=request.args.get('buscar', ''), por_pagina=request.args.get('por_pagina', '5')) }}"
                     aria-label="Anterior">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
@@ -163,7 +165,7 @@
             {% if page_num %}
             <li class="page-item {% if page_num == productos.page %}active{% endif %}">
                 <a class="page-link"
-                    href="{{ url_for('editar', page=page_num, buscar=request.args.get('buscar', '')) }}">
+                    href="{{ url_for('editar', page=page_num, buscar=request.args.get('buscar', ''), por_pagina=request.args.get('por_pagina', '5')) }}">
                     {{ page_num }}
                 </a>
             </li>
@@ -177,7 +179,7 @@
             <!-- Botón Siguiente -->
             <li class="page-item {% if not productos.has_next %}disabled{% endif %}">
                 <a class="page-link"
-                    href="{{ url_for('editar', page=productos.next_num, buscar=request.args.get('buscar', '')) }}"
+                    href="{{ url_for('editar', page=productos.next_num, buscar=request.args.get('buscar', ''), por_pagina=request.args.get('por_pagina', '5')) }}"
                     aria-label="Siguiente">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
@@ -345,6 +347,45 @@
             </html>
         `);
             printWindow.document.close();
+        });
+
+        // 🗑️ ELIMINAR PRODUCTO CON SWEETALERT - NUEVA FUNCIONALIDAD
+        document.querySelectorAll('.btn-eliminar').forEach(button => {
+            button.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                const nombre = this.getAttribute('data-nombre');
+                
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    html: `¿Deseas eliminar el producto <strong>"${nombre}"</strong>?<br><small>Esta acción no se puede deshacer.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-danger mx-2',
+                        cancelButton: 'btn btn-secondary mx-2'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar mensaje de confirmación antes de redirigir
+                        Swal.fire({
+                            title: '¡Eliminado!',
+                            text: `El producto "${nombre}" ha sido eliminado correctamente.`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Redirigir a la URL de eliminación
+                            window.location.href = url;
+                        });
+                    }
+                });
+            });
         });
     });
 </script>
