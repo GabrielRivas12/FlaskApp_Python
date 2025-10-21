@@ -50,74 +50,171 @@
     }
 </script>
 <div class="container p-5 mt-3">
-    <h2 class=" text-center alert alert-danger py-4">Sistema de Gestión de Productos</h2>
-    <div class="row">
+    <h2 class="text-center py-4 text-white rounded-3" 
+        style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+        <i class="fas fa-cogs me-3"></i>Panel de Administración - Viajes Explora
+    </h2>
+    <div class="row mt-4">
         <div class="row text-center">
+            <!-- Tarjeta 1: Gestión de Usuarios -->
             <div class="col-sm-4 mb-3 mb-sm-0">
-                <div class="card" style="background: linear-gradient(180deg, #355e3b, #7a9f7a, #f1eeda);">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <div class="card-body text-white">
-
-                                    <h5 class="card-title">Perfil del Usuario</h5>
-                                    <!-- p class="card-text">Mostrar registro de usuarios</p> -->
-                                    <a href="{{ url_for('listar')}}" class="btn btn-outline-success">Ver
-                                        Detalles</a>
-                                </div>
+                <div class="card shadow-lg border-0 h-100" 
+                     style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+                    <div class="row g-0 h-100">
+                        <div class="col-md-8 d-flex align-items-center">
+                            <div class="card-body text-white">
+                                <h5 class="card-title">
+                                    <i class="fas fa-users me-2"></i>Gestión de Usuarios
+                                </h5>
+                                <p class="card-text small">Administrar usuarios del sistema</p>
+                                <a href="{{ url_for('listar')}}" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver Detalles
+                                </a>
                             </div>
                         </div>
-                        <div class="col-md-4 align-content-center">
-                            <img src="{{ url_for('static', filename='usuarios.png') }}" class="img-fluid rounded-start"
-                                alt="Agregar Usuario ...">
+                        <div class="col-md-4 d-flex align-items-center justify-content-center p-2">
+                            <img src="{{ url_for('static', filename='usuarios.png') }}" 
+                                 class="img-fluid rounded-2" 
+                                 alt="Gestión de Usuarios"
+                                 style="max-height: 80px; object-fit: contain;">
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Tarjeta 2: Registrar Destinos -->
             <div class="col-sm-4 mb-3 mb-sm-0">
-                <div class="card" style="background: linear-gradient(180deg, #042bf1,#367cd9,#ffffff);">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <div class="card-body text-white">
-                                    <h5 class="card-title">Registrar Productos</h5>
-                                    <!-- <p class="card-text">Agregar los productos al sistema</p> -->
-                                    <a href="{{ url_for('productos') }}"
-                                        class="btn btn-outline-success">Ver
-                                        Detalles</a>
-                                </div>
+                <div class="card shadow-lg border-0 h-100"
+                     style="background: linear-gradient(140deg, #28a745, #20c997, #17a2b8);">
+                    <div class="row g-0 h-100">
+                        <div class="col-md-8 d-flex align-items-center">
+                            <div class="card-body text-white">
+                                <h5 class="card-title">
+                                    <i class="fas fa-map-marked-alt me-2"></i>Registrar Destinos
+                                </h5>
+                                <p class="card-text small">Agregar nuevos destinos turísticos</p>
+                                <a href="{{ url_for('productos') }}" 
+                                   class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-plus me-1"></i>Agregar Destino
+                                </a>
                             </div>
                         </div>
-                        <div class="col-md-4 align-content-center">
-                            <a href="{{ url_for('agregar_producto') }}">
+                        <div class="col-md-4 d-flex align-items-center justify-content-center p-2">
+                            <a href="{{ url_for('productos') }}">
                                 <img src="{{ url_for('static', filename='agregarproductos.png') }}"
-                                    class="img-fluid rounded-start" alt="..."></a>
+                                    class="img-fluid rounded-2" 
+                                    alt="Agregar Destinos"
+                                    style="max-height: 80px; object-fit: contain;">
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 mb-3 mb-sm-0">
-                <div class="card" style="background: linear-gradient(180deg, #0b235c,#3d85a9,#e0f7ff);">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <div class="card-body text-white">
-                                    <h5 class="card-title">Visualizar Productos</h5>
-                                    <!-- <p class="card-text">Muestra lista de productos</p> -->
-                                    <a href="{{ url_for('editar') }}" class="btn btn-outline-success">Ver
-                                        Detalles</a>
-                                </div>
 
+            <!-- Tarjeta 3: Visualizar Destinos -->
+            <div class="col-sm-4 mb-3 mb-sm-0">
+                <div class="card shadow-lg border-0 h-100"
+                     style="background: linear-gradient(140deg, #6f42c1, #8b5cf6, #007bff);">
+                    <div class="row g-0 h-100">
+                        <div class="col-md-8 d-flex align-items-center">
+                            <div class="card-body text-white">
+                                <h5 class="card-title">
+                                    <i class="fas fa-list-alt me-2"></i>Visualizar Destinos
+                                </h5>
+                                <p class="card-text small">Gestionar destinos disponibles</p>
+                                <a href="{{ url_for('editar') }}" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Gestionar
+                                </a>
                             </div>
                         </div>
-                        <div class="col-md-4 align-content-center">
+                        <div class="col-md-4 d-flex align-items-center justify-content-center p-2">
                             <img src="{{ url_for('static', filename='listarproductos.png') }}"
-                                class="img-fluid rounded-start" alt="...">
+                                class="img-fluid rounded-2" 
+                                alt="Lista de Destinos"
+                                style="max-height: 80px; object-fit: contain;">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="text-center mb-4" style="color: #007bff;">
+                <i class="fas fa-chart-line me-2"></i>Estadísticas Rápidas
+            </h4>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center border-0 shadow-sm h-100" 
+                 style="background-color: #e8f4f8; border-left: 4px solid #007bff !important;">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x mb-2" style="color: #007bff;"></i>
+                    <h5 style="color: #007bff;">Usuarios</h5>
+                    <h3 class="text-primary">150</h3>
+                    <small class="text-muted">Total registrados</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center border-0 shadow-sm h-100"
+                 style="background-color: #e8f4f8; border-left: 4px solid #28a745 !important;">
+                <div class="card-body">
+                    <i class="fas fa-map-marked-alt fa-2x mb-2" style="color: #28a745;"></i>
+                    <h5 style="color: #28a745;">Destinos</h5>
+                    <h3 class="text-success">45</h3>
+                    <small class="text-muted">Disponibles</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center border-0 shadow-sm h-100"
+                 style="background-color: #e8f4f8; border-left: 4px solid #ffc107 !important;">
+                <div class="card-body">
+                    <i class="fas fa-hotel fa-2x mb-2" style="color: #ffc107;"></i>
+                    <h5 style="color: #ffc107;">Reservas</h5>
+                    <h3 class="text-warning">89</h3>
+                    <small class="text-muted">Este mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center border-0 shadow-sm h-100"
+                 style="background-color: #e8f4f8; border-left: 4px solid #dc3545 !important;">
+                <div class="card-body">
+                    <i class="fas fa-comments fa-2x mb-2" style="color: #dc3545;"></i>
+                    <h5 style="color: #dc3545;">Consultas</h5>
+                    <h3 class="text-danger">23</h3>
+                    <small class="text-muted">Pendientes</small>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+        border-radius: 1rem;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15) !important;
+    }
+    
+    .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+    }
+    
+    .rounded-3 {
+        border-radius: 1rem !important;
+    }
+    
+    .rounded-2 {
+        border-radius: 0.75rem !important;
+    }
+</style>
 {% endblock %}

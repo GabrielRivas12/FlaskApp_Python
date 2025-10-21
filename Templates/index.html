@@ -2,7 +2,7 @@
 {% block title %}Prueba{% endblock title %}
 {% block body %}
 
-<div class="d-flex flex-column" style="min-height: 100vh; background-color: #e9e9e9;">
+<div class="d-flex flex-column" style="min-height: 100vh; background-color: #f8f9fa;">
 
     <head>
         <!-- Incluir Font Awesome desde CDN -->
@@ -44,29 +44,28 @@
 
 
     <!-- Contenedor principal encabezado-->
-    <div class="container-fluid p-5 text-white text-center" style="background-color: #e9e9e9;">
-        <h1 style="color: #000000;">INFORMACIÓN</h1>
+    <div class="container-fluid p-3 text-white text-center" style="background-color: #f8f9fa;">
     </div>
 
     <!-- Contenedor de columnas pie de pagina -->
-    <div class="container mt-5">
+    <div class="container mt-3">
         <div class="row g-4"> <!-- Usamos g-4 para el espaciado entre columnas -->
             <div class="col-md-4">
-                <div class="border shadow p-3 mb-5 bg-body rounded">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+                <div class="border shadow p-3 mb-5 bg-body rounded" style="background-color: #e8f4f8 !important; border-color: #17a2b8 !important;">
+                    <h5 style="color: #007bff;">Nuestra Misión</h5>
+                    <p class="text-justify">Facilitar experiencias de viaje inolvidables conectando a nuestros clientes con los destinos más fascinantes del mundo, ofreciendo servicios personalizados y de calidad que superen sus expectativas.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="border shadow p-3 mb-5 bg-body rounded">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+                <div class="border shadow p-3 mb-5 bg-body rounded" style="background-color: #e8f4f8 !important; border-color: #17a2b8 !important;">
+                    <h5 style="color: #007bff;">Nuestra Visión</h5>
+                    <p class="text-justify">Ser la agencia de viajes líder en Latinoamérica, reconocida por nuestra innovación, servicio excepcional y compromiso con el turismo sostenible y responsable.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="border shadow p-3 mb-5 bg-body rounded">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+                <div class="border shadow p-3 mb-5 bg-body rounded" style="background-color: #e8f4f8 !important; border-color: #17a2b8 !important;">
+                    <h5 style="color: #007bff;">Nuestros Valores</h5>
+                    <p class="text-justify">Pasión por los viajes, compromiso con la calidad, responsabilidad social y ambiental, innovación constante y atención personalizada a cada cliente.</p>
                 </div>
             </div>
         </div>
@@ -75,61 +74,56 @@
 
 
     <!-- Contenedor principal encabezado-->
-    <div class="container-fluid p-2 text-white text-center" style="background-color: #e9e9e9;">
-        <h1 style="color: #000000;">SERVICIOS</h1>
+    <div class="container-fluid p-2 text-white text-center" style="background-color: #f8f9fa;">
+        <h1 style="color: #007bff;">SERVICIOS</h1>
     </div>
 
     <!-- Contenedor de columnas pie de pagina -->
-    <div class="container mt-5 pb-5" style="background-color: #e9e9e9;">
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="card shadow" style="width: 25rem; height: 600px;">
-                    <div style="border-radius: 80%;">
-                        <img src="{{ url_for('static', filename='venta.png') }}" class="card-img-top" alt="..."
-                            style="border-radius: 100%;">
+    <div class="container mt-5 pb-5" style="background-color: #f8f9fa;">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow d-flex flex-column h-100" style="border-color: #17a2b8; min-height: 600px;">
+                    <div class="text-center mt-4">
+                        <img src="{{ url_for('static', filename='venta.png') }}" class="card-img-top img-fluid" alt="Viajes"
+                            style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 3px solid #17a2b8;">
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Ventas</h5>
-                        <p class="card-text">This is longer card with supporting test bellow as a natural lead-in to
-                            additional content. The content is a little bit longer</p>
-                    </div>
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <button class="btn btn-primary" type="submit"
-                            style=" padding: 0.3rem 1rem; width: 100px; height: 40px;">Ver mas...</button>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-center" style="color: #007bff; font-size: 1.4rem; margin-top: 10px;">Viajes</h5>
+                        <p class="card-text flex-grow-1 text-justify">Descubre destinos increíbles alrededor del mundo. Ofrecemos paquetes de viaje personalizados para todas las preferencias y presupuestos. Vive experiencias únicas con nuestros servicios de viaje. Nuestros expertos en viajes están disponibles para asesorarte en cada paso del proceso, desde la planificación hasta el regreso.</p>
+                        <div class="text-center mt-auto pt-3">
+                            <button class="btn" type="submit" style="background-color: #17a2b8; color: white; width: 140px; height: 45px; font-size: 1.1rem;">Ver más...</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-sm-4 ">
-                <div class="card shadow" style="width: 25rem;  height: 600px;">
-                    <div style="border-radius: 80%;">
-                        <img src="{{ url_for('static', filename='producto.png') }}" class="card-img-top" alt="..."
-                            style="border-radius: 200%;">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow d-flex flex-column h-100" style="border-color: #17a2b8; min-height: 600px;">
+                    <div class="text-center mt-4">
+                        <img src="{{ url_for('static', filename='producto.png') }}" class="card-img-top img-fluid" alt="Reservas de Hoteles"
+                            style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 3px solid #17a2b8;">
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Productos</h5>
-                        <p class="card-text">This is a short card</p>
-                    </div>
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <button class="btn btn-primary" type="submit"
-                            style=" padding: 0.3rem 1rem; width: 100px; height: 40px;">Ver mas...</button>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-center" style="color: #007bff; font-size: 1.4rem; margin-top: 10px;">Reservas de Hoteles</h5>
+                        <p class="card-text flex-grow-1 text-justify">Encuentra el alojamiento perfecto para tu próximo viaje. Desde lujosos resorts hasta acogedores hostales, tenemos opciones para todos los gustos y presupuestos. Nuestro sistema de reservas te permite comparar precios, leer reseñas de otros viajeros y encontrar las mejores ofertas disponibles.</p>
+                        <div class="text-center mt-auto pt-3">
+                            <button class="btn" type="submit" style="background-color: #17a2b8; color: white; width: 140px; height: 45px; font-size: 1.1rem;">Ver más...</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="card shadow" style="width: 25rem;  height: 600px;">
-                    <div style="border-radius: 80%;">
-                        <img src="{{ url_for('static', filename='carrito.png') }}" class="card-img-top" alt="..."
-                            style="border-radius: 100%;">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card shadow d-flex flex-column h-100" style="border-color: #17a2b8; min-height: 600px;">
+                    <div class="text-center mt-4">
+                        <img src="{{ url_for('static', filename='carrito.png') }}" class="card-img-top img-fluid" alt="Puntos Turísticos"
+                            style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 3px solid #17a2b8;">
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Carrito</h5>
-                        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                            additional content.</p>
-                    </div>
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <button class="btn btn-primary" type="submit"
-                            style=" padding: 0.3rem 1rem; width: 100px; height: 40px;">Ver mas...</button>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-center" style="color: #007bff; font-size: 1.4rem; margin-top: 10px;">Puntos Turísticos</h5>
+                        <p class="card-text flex-grow-1 text-justify">Explora los lugares más emblemáticos de cada destino. Te ayudamos a descubrir atracciones, monumentos históricos y experiencias locales auténticas que harán de tu viaje algo inolvidable. Nuestras guías detalladas incluyen información sobre horarios, precios de entrada, consejos para evitar multitudes y recomendaciones de los mejores momentos para visitar cada lugar.</p>
+                        <div class="text-center mt-auto pt-3">
+                            <button class="btn" type="submit" style="background-color: #17a2b8; color: white; width: 140px; height: 45px; font-size: 1.1rem;">Ver más...</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -141,51 +135,110 @@
     <style>
         /* Estilo para el hover de los enlaces */
         a.text-white:hover {
-            color: #17181a !important;
+            color: #17a2b8 !important;
             text-decoration: underline;
         }
 
         /* Estilo para cambiar el color del texto en el footer */
         .footer-text {
-            color: #a9a9a8;
-            /* Cambia este valor al color que prefieras */
+            color: #c8e6f0;
+        }
+        
+        /* Estilo para los botones al hacer hover */
+        .btn:hover {
+            background-color: #138496 !important;
+            color: white !important;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Mejoras para las tarjetas */
+        .card {
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Estilo para texto justificado */
+        .text-justify {
+            text-align: justify;
+            text-justify: inter-word;
+        }
+        
+        /* Asegurar que las tarjetas mantengan su altura en dispositivos móviles */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 25px;
+                min-height: 550px !important;
+            }
+            
+            .card-img-top {
+                width: 180px !important;
+                height: 180px !important;
+            }
+        }
+        
+        /* Ajustes para pantallas muy pequeñas */
+        @media (max-width: 576px) {
+            .card {
+                min-height: 500px !important;
+            }
+            
+            .card-img-top {
+                width: 160px !important;
+                height: 160px !important;
+            }
+            
+            .card-title {
+                font-size: 1.2rem !important;
+            }
+            
+            .btn {
+                width: 120px !important;
+                height: 40px !important;
+                font-size: 1rem !important;
+            }
         }
     </style>
 
 
 
-    <footer style="margin-top: auto; width: 100%; height: 60%; background-color: #000;">
+    <footer style="margin-top: auto; width: 100%; background-color: #007bff;">
         <div class="container mt-5 text-white" style="padding: 50px;">
             <div class="row">
                 <!-- Columna 1 -->
                 <div class="col-sm-3">
-                    <h5>APP SYSTEM</h5>
+                    <h5>VIAJES EXPLORA</h5>
                     <p class="footer-text">Juigalpa, Chontales</p>
                     <p class="footer-text">Nicaragua</p>
                 </div>
                 <!-- Columna 2 -->
                 <div class="col-sm-3">
-                    <h5>Cursos</h5>
-                    <p class="footer-text">Python</p>
-                    <p class="footer-text">JavaScript</p>
-                    <p class="footer-text">Bootstrap</p>
+                    <h5>Destinos Populares</h5>
+                    <p class="footer-text">Playas del Caribe</p>
+                    <p class="footer-text">Europa Clásica</p>
+                    <p class="footer-text">Asia Exótica</p>
                 </div>
                 <!-- Columna 3 -->
                 <div class="col-sm-3">
                     <h5>Links</h5>
-                    <p class="footer-text">Terms & Conditions</p>
+                    <p class="footer-text">Términos & Condiciones</p>
+                    <p class="footer-text">Política de Privacidad</p>
                 </div>
                 <!-- Columna 4 -->
                 <div class="col-sm-3">
                     <h5>Contactos</h5>
                     <p class="footer-text"><i class="fab fa-facebook"></i> Facebook</p>
                     <p class="footer-text"><i class="fab fa-instagram"></i> Instagram</p>
+                    <p class="footer-text"><i class="fab fa-whatsapp"></i> WhatsApp</p>
                 </div>
 
-                <hr>
-                <p class="text-center"> © Copyright - All rigths reserver 2025</p>
+                <hr class="mt-4">
+                <p class="text-center mt-3"> © Copyright - Todos los derechos reservados 2025</p>
             </div>
         </div>
     </footer>
 </div>
-<div {% endblock %}
+{% endblock %}

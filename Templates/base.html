@@ -4,28 +4,38 @@
 <head>
     <link rel="shortcut icon" href="{{ url_for('static', filename='icono.png') }}" type="image/x-icon">
 
-   <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+   <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">SISTEMA</a>
+        <a class="navbar-brand fw-bold" href="#" style="font-size: 1.5rem;">
+            <i class="fas fa-plane me-2"></i>NICA EXPLORA
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
             aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent"> accordion
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Usamos d-flex y mx-auto para centrar los elementos -->
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="inicio">Inicio</a>
+                    <a class="nav-link active" aria-current="page" href="inicio">
+                        <i class="fas fa-home me-1"></i>Inicio
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="contactopost">Contactos</a>
+                    <a class="nav-link" href="contactopost">
+                        <i class="fas fa-address-book me-1"></i>Contactos
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="about">Acerca de</a>
+                    <a class="nav-link" href="about">
+                        <i class="fas fa-info-circle me-1"></i>Acerca de
+                    </a>
                 </li>
             </ul>
-            <a href="login" style="background: linear-gradient(140deg, #121959,#172179,#384194);" class="btn btn-secondary">Login</a>
+            <a href="login" class="btn btn-outline-light">
+                <i class="fas fa-sign-in-alt me-1"></i>Login
+            </a>
         </div>
     </div>
 </nav>
@@ -42,9 +52,47 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@2"></script>
 
+    <style>
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+    </style>
 
 </head>
 

@@ -1,6 +1,6 @@
 {% extends "baseadmin.html" %}
 
-{% block titulo %} Lista de Productos {% endblock titulo %}
+{% block titulo %} Agregar Destinos {% endblock titulo %}
 
 {% block body %}
 
@@ -31,88 +31,259 @@
 </ul>
 {% endif %}
 {% endwith %}
-<!--MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2-->
-<script>
-    function confirmarEliminacion(url) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡No podrás revertir esto!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
-        });
-    }
-</script>
 
 <div class="container mt-4">
 
-    <div class="row">
-        <!-- Formulario para agregar producto -->
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 mb-3" style="background-color: #ffffff;">
-                <!-- Encabezado -->
-                <div class="card-header text-white fw-bold text-center" style="background-color: #e21313;">
-                    Agregar Producto
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('agregar_producto') }}">
+    <!-- Encabezado Principal -->
+    <div class="rounded-3 p-4 mb-4 shadow-sm text-white text-center"
+         style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+        <h2 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Agregar Nuevos Destinos</h2>
+        <p class="mb-0 mt-2 opacity-75">Registra nuevos destinos turísticos en el sistema</p>
+    </div>
 
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre del Producto</label>
-                            <input type="text" class="form-control" name="nombre" required>
+    <div class="row">
+        <!-- Formulario para agregar destino -->
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 mb-4">
+                <!-- Encabezado del Formulario -->
+                <div class="card-header text-white rounded-top-3 py-3"
+                     style="background: linear-gradient(90deg, #28a745, #20c997);">
+                    <h5 class="mb-0 text-center">
+                        <i class="fas fa-map-marked-alt me-2"></i>Nuevo Destino Turístico
+                    </h5>
+                </div>
+                <div class="card-body p-4" style="background-color: #f8f9fa;">
+                    <form method="POST" action="{{ url_for('agregar_producto') }}">
+                        <div class="mb-4">
+                            <label for="nombre" class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-map-pin me-2"></i>Nombre del Destino
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                    <i class="fas fa-signature" style="color: #007bff;"></i>
+                                </span>
+                                <input type="text" class="form-control" name="nombre" 
+                                       placeholder="Ej: Playa del Carmen, Machu Picchu..." 
+                                       style="border-color: #17a2b8;" required>
+                            </div>
+                            <small class="form-text text-muted">Ingresa el nombre atractivo del destino</small>
                         </div>
-                        <div class="mb-3">
-                            <label for="precio" class="form-label">Precio</label>
-                            <input type="number" step="0.01" class="form-control" name="precio" required>
+
+                        <div class="mb-4">
+                            <label for="precio" class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-dollar-sign me-2"></i>Precio por Persona
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                    <i class="fas fa-tag" style="color: #007bff;"></i>
+                                </span>
+                                <input type="number" step="0.01" class="form-control" name="precio" 
+                                       placeholder="0.00" min="0" 
+                                       style="border-color: #17a2b8;" required>
+                                <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">USD</span>
+                            </div>
+                            <small class="form-text text-muted">Precio base por persona en dólares</small>
                         </div>
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" name="descripcion" rows="3"></textarea>
+
+                        <div class="mb-4">
+                            <label for="descripcion" class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-info-circle me-2"></i>Descripción del Destino
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start" 
+                                      style="background-color: #e8f4f8; border-color: #17a2b8; padding-top: 12px;">
+                                    <i class="fas fa-comment" style="color: #007bff;"></i>
+                                </span>
+                                <textarea class="form-control" name="descripcion" rows="4"
+                                          placeholder="Describe las atracciones, actividades y características únicas de este destino..."
+                                          style="border-color: #17a2b8;"></textarea>
+                            </div>
+                            <small class="form-text text-muted">Incluye información relevante para los viajeros</small>
                         </div>
-                        <button type="submit" class="btn btn-outline-success w-100">Agregar Producto</button>
+
+                        <button type="submit" class="btn w-100 text-white fw-bold py-2 mt-3"
+                                style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+                            <i class="fas fa-plus-circle me-2"></i>Agregar Destino
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
 
-
-        <!-- Tabla de productos -->
-        <div class="col-md-8">
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white text-center fw-bold">
-                    Lista de Productos
+        <!-- Lista de destinos existentes -->
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 h-100">
+                <!-- Encabezado de la Lista -->
+                <div class="card-header text-white rounded-top-3 py-3"
+                     style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                    <h5 class="mb-0 text-center">
+                        <i class="fas fa-list me-2"></i>Destinos Registrados Recientemente
+                    </h5>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped text-center align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Descripción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for producto in productos %}
-                            <tr>
-                                <td>{{ producto.id }}</td>
-                                <td>{{ producto.nombre }}</td>
-                                <td>{{ producto.precio }}</td>
-                                <td>{{ producto.descripcion }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="text-white"
+                                   style="background: linear-gradient(90deg, #138496, #17a2b8);">
+                                <tr>
+                                    <th class="text-center" style="width: 80px;">
+                                        <i class="fas fa-hashtag"></i>
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-map-pin me-1"></i>Destino
+                                    </th>
+                                    <th class="text-center" style="width: 120px;">
+                                        <i class="fas fa-dollar-sign me-1"></i>Precio
+                                    </th>
+                                    <th class="text-center" style="width: 100px;">
+                                        <i class="fas fa-cogs me-1"></i>Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos %}
+                                <tr style="background-color: #f8f9fa;">
+                                    <td class="text-center fw-bold" style="color: #007bff;">
+                                        {{ producto.id }}
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold" style="color: #495057;">
+                                            {{ producto.nombre }}
+                                        </div>
+                                        <small class="text-muted text-truncate d-block" style="max-width: 200px;">
+                                            {{ producto.descripcion[:60] }}{% if producto.descripcion|length > 60 %}...{% endif %}
+                                        </small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2">
+                                            ${{ "%.2f"|format(producto.precio) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('editar') }}" class="btn btn-outline-primary" title="Gestionar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('eliminar_producto', id=producto.id) }}" 
+                                               class="btn btn-outline-danger" 
+                                               onclick="confirmarEliminacion(this.href); return false;"
+                                               title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block" style="color: #6c757d;"></i>
+                                        No hay destinos registrados aún
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Footer de la tabla -->
+                <div class="card-footer text-center py-3" style="background-color: #e8f4f8;">
+                    <a href="{{ url_for('editar') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-list me-1"></i>Ver Todos los Destinos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background-color: #e8f4f8;">
+                <div class="card-body text-center py-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-globe-americas fa-2x me-3" style="color: #007bff;"></i>
+                                <div class="text-start">
+                                    <h6 class="mb-0 fw-bold" style="color: #007bff;">Destinos Totales</h6>
+                                    <small class="text-muted">{{ productos|length }} registrados</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-plus-circle fa-2x me-3" style="color: #28a745;"></i>
+                                <div class="text-start">
+                                    <h6 class="mb-0 fw-bold" style="color: #28a745;">Fácil Registro</h6>
+                                    <small class="text-muted">Agrega en segundos</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-edit fa-2x me-3" style="color: #ffc107;"></i>
+                                <div class="text-start">
+                                    <h6 class="mb-0 fw-bold" style="color: #ffc107;">Edición Sencilla</h6>
+                                    <small class="text-muted">Modifica cuando quieras</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-shield-alt fa-2x me-3" style="color: #dc3545;"></i>
+                                <div class="text-start">
+                                    <h6 class="mb-0 fw-bold" style="color: #dc3545;">Gestión Segura</h6>
+                                    <small class="text-muted">Control total</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+    
+    .input-group-text {
+        transition: all 0.3s ease;
+    }
+    
+    .input-group:focus-within .input-group-text {
+        background-color: #17a2b8 !important;
+        color: white !important;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: #e8f4f8 !important;
+        transition: all 0.2s ease;
+    }
+    
+    .rounded-top-3 {
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+    }
+    
+    .card {
+        border-radius: 1rem;
+    }
+    
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
 {% endblock %}
