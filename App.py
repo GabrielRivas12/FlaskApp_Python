@@ -264,7 +264,7 @@ def accesologin():
             if user['id_rol'] == 1:
                 return render_template('admin.html')
             elif user['id_rol'] == 2:
-                return render_template('index.html')
+                return render_template('iniciousuario.html')
         else:
             flash('Usuario y contraseña incorrectos', 'danger')
             return render_template('Login.html', error='Usuarios y contraseña incorrectos')
@@ -340,6 +340,10 @@ def inicio():
 @app.route('/contacto')
 def contacto():
     return render_template('Contactos.html')
+
+@app.route('/iniciousuario')
+def iniciou():
+    return render_template('iniciousuario.html')
 
 @app.route('/contactopost', methods=['GET', 'POST'])
 def contactopost():
