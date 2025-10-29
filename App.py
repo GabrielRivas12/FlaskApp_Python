@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
+from passlib.hash import pbkdf2_sha256
 
 app = Flask(__name__)
 
@@ -23,14 +24,23 @@ def home():
 
 @app.route('/logout')
 def logout():
+    session.clear()
+    flash('Sesión cerrada correctamente', 'info')
     return redirect(url_for('inicio'))
 
 @app.route('/admin')
 def administrador():
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
     return render_template('admin.html')
 
 @app.route('/listar')
 def listar():
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT * FROM usuario')
     usuarios = cursor.fetchall()
@@ -39,6 +49,10 @@ def listar():
 
 @app.route('/eliminar_usuario/<int:id>')
 def eliminar_usuario(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     cursor = mysql.connection.cursor()
     cursor.execute('DELETE FROM usuario WHERE id = %s', (id,))
     mysql.connection.commit()
@@ -48,13 +62,26 @@ def eliminar_usuario(id):
 
 @app.route('/editar_usuario_modal/<int:id>', methods=['POST'])
 def editar_usuario_modal(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     nombre = request.form['nombre']
     email = request.form['email']
     password = request.form['password']
 
     cursor = mysql.connection.cursor()
-    cursor.execute('UPDATE usuario SET nombre = %s, email = %s, password = %s WHERE id = %s',
-                   (nombre, email, password, id))
+    
+    # Si se proporcionó una nueva contraseña, encriptarla
+    if password:
+        hashed_password = pbkdf2_sha256.hash(password)
+        cursor.execute('UPDATE usuario SET nombre = %s, email = %s, password = %s WHERE id = %s',
+                       (nombre, email, hashed_password, id))
+    else:
+        # Si no se cambió la contraseña, mantener la actual
+        cursor.execute('UPDATE usuario SET nombre = %s, email = %s WHERE id = %s',
+                       (nombre, email, id))
+    
     mysql.connection.commit()
     cursor.close()
 
@@ -63,13 +90,20 @@ def editar_usuario_modal(id):
 
 @app.route('/agregar_usuario', methods=['POST'])
 def agregar_usuario():
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     nombre = request.form['nombre']
     email = request.form['email']
     password = request.form['password']
+    
+    # Encriptar la contraseña
+    hashed_password = pbkdf2_sha256.hash(password)
 
     cursor = mysql.connection.cursor()
     cursor.execute('INSERT INTO usuario (nombre, email, password, id_rol) VALUES (%s, %s, %s, %s)',
-                   (nombre, email, password, 2))
+                   (nombre, email, hashed_password, 2))
     mysql.connection.commit()
     cursor.close()
 
@@ -107,6 +141,10 @@ def agregar_producto():
 
 @app.route('/eliminar_producto/<int:id>')
 def eliminar_producto(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     cursor = mysql.connection.cursor()
     cursor.execute('DELETE FROM reservaciones WHERE id = %s', (id,))
     mysql.connection.commit()
@@ -116,6 +154,10 @@ def eliminar_producto(id):
 
 @app.route('/editar_producto_modal/<int:id>', methods=['POST'])
 def editar_producto_modal(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     nombrelugar = request.form['nombrelugar']
     nhabitacion = request.form['nhabitacion']
     tipohabitacion = request.form['tipohabitacion']
@@ -138,6 +180,10 @@ def editar_producto_modal(id):
 
 @app.route('/editar')
 def editar():
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
     page = request.args.get('page', 1, type=int)
     buscar = request.args.get('buscar', '')
     por_pagina = request.args.get('por_pagina', 5, type=int)
@@ -217,6 +263,10 @@ def editar():
 
 @app.route('/reservaciones')
 def reservaciones():
+    if 'id_rol' not in session:
+        flash('Debes iniciar sesión para ver las reservaciones', 'warning')
+        return redirect(url_for('login'))
+    
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT * FROM reservaciones ORDER BY id DESC LIMIT 5')
     reservaciones = cursor.fetchall()
@@ -225,6 +275,10 @@ def reservaciones():
 
 @app.route('/agregar_reservacion', methods=['POST'])
 def agregar_reservacion():
+    if 'id_rol' not in session:
+        flash('Debes iniciar sesión para agregar reservaciones', 'warning')
+        return redirect(url_for('login'))
+    
     nombrelugar = request.form['nombrelugar']
     nhabitacion = request.form['nhabitacion']
     tipohabitacion = request.form['tipohabitacion']
@@ -248,26 +302,34 @@ def agregar_reservacion():
 def accesologin():
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
         email = request.form['email']
-        password = request.form['password']
+        password_candidate = request.form['password']  # Contraseña sin encriptar del formulario
 
         cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM usuario WHERE email = %s AND password = %s', (email, password))
+        # Solo buscar por email, no por password
+        cursor.execute('SELECT * FROM usuario WHERE email = %s', (email,))
         user = cursor.fetchone()
         cursor.close()
 
         if user:
-            session['id_rol'] = user['id_rol']
-            session['user_email'] = user['email']
-            session['user_id'] = user['id']
-            session['user_nombre'] = user['nombre']
+            # Verificar la contraseña usando passlib
+            if pbkdf2_sha256.verify(password_candidate, user['password']):
+                session['id_rol'] = user['id_rol']
+                session['user_email'] = user['email']
+                session['user_id'] = user['id']
+                session['user_nombre'] = user['nombre']
 
-            if user['id_rol'] == 1:
-                return render_template('admin.html')
-            elif user['id_rol'] == 2:
-                return render_template('iniciousuario.html')
+                if user['id_rol'] == 1:
+                    flash('Bienvenido Administrador', 'success')
+                    return redirect(url_for('administrador'))
+                elif user['id_rol'] == 2:
+                    flash('Bienvenido Usuario', 'success')
+                    return redirect(url_for('iniciou'))
+            else:
+                flash('Contraseña incorrecta', 'danger')
+                return render_template('Login.html', error='Contraseña incorrecta')
         else:
-            flash('Usuario y contraseña incorrectos', 'danger')
-            return render_template('Login.html', error='Usuarios y contraseña incorrectos')
+            flash('Usuario no encontrado', 'danger')
+            return render_template('Login.html', error='Usuario no encontrado')
 
     return render_template('Login.html')
 
@@ -283,6 +345,9 @@ def registro():
         if password != confirm_password:
             return render_template('Registro.html', error='Las contraseñas no coinciden')
 
+        # Encriptar la contraseña
+        hashed_password = pbkdf2_sha256.hash(password)
+
         cursor = mysql.connection.cursor()
 
         # Verificar que no exista un usuario con ese email
@@ -293,15 +358,15 @@ def registro():
             cursor.close()
             return render_template('Registro.html', error='El correo ya está registrado')
 
-        # Insertar nuevo usuario (id_rol por defecto 2)
+        # Insertar nuevo usuario con contraseña encriptada
         cursor.execute('INSERT INTO usuario (nombre, email, password, id_rol) VALUES (%s, %s, %s, %s)',
-                       (nombre, email, password, 2))
+                       (nombre, email, hashed_password, 2))
         mysql.connection.commit()
         cursor.close()
 
+        flash('Registro exitoso. Ahora puedes iniciar sesión.', 'success')
         return redirect(url_for('login'))
 
-    # Si es GET solo mostrar el formulario
     return render_template('Registro.html')
 
 @app.route('/perfilusuario')
@@ -343,6 +408,9 @@ def contacto():
 
 @app.route('/iniciousuario')
 def iniciou():
+    if 'id_rol' not in session or session['id_rol'] != 2:
+        flash('Debes iniciar sesión como usuario', 'warning')
+        return redirect(url_for('login'))
     return render_template('iniciousuario.html')
 
 @app.route('/contactopost', methods=['GET', 'POST'])
