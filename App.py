@@ -9,11 +9,11 @@ app.secret_key = 'appsecretkey'  # clave secreta para la sesion
 mysql = MySQL()  # inicializa la conexion a la DB
 
 # conexion a la DB
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = 'bhkpenjua0fqusqf6wi0-mysql.services.clever-cloud.com'
 app.config['MYSQL_PORT'] = 3306
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'ventas'
+app.config['MYSQL_USER'] = 'uyckttcjtyg86kts'
+app.config['MYSQL_PASSWORD'] = '15PRdRINHs4qQ3QFb15W'
+app.config['MYSQL_DB'] = 'bhkpenjua0fqusqf6wi0'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql.init_app(app)  # inicializa la conexion a la DB
