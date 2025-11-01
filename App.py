@@ -42,7 +42,7 @@ def listar():
         return redirect(url_for('login'))
     
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM usuario')
+    cursor.execute('SELECT * FROM usuario ORDER BY id')
     usuarios = cursor.fetchall()
     cursor.close()
     return render_template('listausuarios.html', usuarios=usuarios)
@@ -60,34 +60,6 @@ def eliminar_usuario(id):
     flash('Usuario eliminado correctamente', 'success')
     return redirect(url_for('listar'))
 
-@app.route('/editar_usuario_modal/<int:id>', methods=['POST'])
-def editar_usuario_modal(id):
-    if 'id_rol' not in session or session['id_rol'] != 1:
-        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
-        return redirect(url_for('login'))
-    
-    nombre = request.form['nombre']
-    email = request.form['email']
-    password = request.form['password']
-
-    cursor = mysql.connection.cursor()
-    
-    # Si se proporcionó una nueva contraseña, encriptarla
-    if password:
-        hashed_password = pbkdf2_sha256.hash(password)
-        cursor.execute('UPDATE usuario SET nombre = %s, email = %s, password = %s WHERE id = %s',
-                       (nombre, email, hashed_password, id))
-    else:
-        # Si no se cambió la contraseña, mantener la actual
-        cursor.execute('UPDATE usuario SET nombre = %s, email = %s WHERE id = %s',
-                       (nombre, email, id))
-    
-    mysql.connection.commit()
-    cursor.close()
-
-    flash('Usuario actualizado correctamente', 'success')
-    return redirect(url_for('listar'))
-
 @app.route('/agregar_usuario', methods=['POST'])
 def agregar_usuario():
     if 'id_rol' not in session or session['id_rol'] != 1:
@@ -97,18 +69,79 @@ def agregar_usuario():
     nombre = request.form['nombre']
     email = request.form['email']
     password = request.form['password']
+    id_rol = request.form['id_rol']
+    
+    # Validar que las contraseñas coincidan
+    confirm_password = request.form['confirm_password']
+    if password != confirm_password:
+        flash('Las contraseñas no coinciden', 'danger')
+        return redirect(url_for('listar'))
     
     # Encriptar la contraseña
     hashed_password = pbkdf2_sha256.hash(password)
 
     cursor = mysql.connection.cursor()
+    
+    # Verificar si el email ya existe
+    cursor.execute('SELECT * FROM usuario WHERE email = %s', (email,))
+    existing_user = cursor.fetchone()
+    
+    if existing_user:
+        flash('El correo electrónico ya está registrado', 'danger')
+        cursor.close()
+        return redirect(url_for('listar'))
+    
     cursor.execute('INSERT INTO usuario (nombre, email, password, id_rol) VALUES (%s, %s, %s, %s)',
-                   (nombre, email, hashed_password, 2))
+                   (nombre, email, hashed_password, id_rol))
     mysql.connection.commit()
     cursor.close()
 
     flash('Usuario agregado correctamente', 'success')
     return redirect(url_for('listar'))
+
+@app.route('/editar_usuario_modal/<int:id>', methods=['POST'])
+def editar_usuario_modal(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
+    nombre = request.form['nombre']
+    email = request.form['email']
+    password = request.form['password']
+    id_rol = request.form['id_rol']
+
+    cursor = mysql.connection.cursor()
+    
+    # Verificar si el email ya existe en otro usuario
+    cursor.execute('SELECT * FROM usuario WHERE email = %s AND id != %s', (email, id))
+    existing_user = cursor.fetchone()
+    
+    if existing_user:
+        flash('El correo electrónico ya está registrado por otro usuario', 'danger')
+        cursor.close()
+        return redirect(url_for('listar'))
+    
+    # Si se proporcionó una nueva contraseña, encriptarla
+    if password and password != "":
+        # Verificar si la contraseña ya está encriptada (no volver a encriptar si ya lo está)
+        if not password.startswith('$pbkdf2-sha256$'):
+            hashed_password = pbkdf2_sha256.hash(password)
+            cursor.execute('UPDATE usuario SET nombre = %s, email = %s, password = %s, id_rol = %s WHERE id = %s',
+                           (nombre, email, hashed_password, id_rol, id))
+        else:
+            # Si ya está encriptada, usar directamente
+            cursor.execute('UPDATE usuario SET nombre = %s, email = %s, password = %s, id_rol = %s WHERE id = %s',
+                           (nombre, email, password, id_rol, id))
+    else:
+        # Si no se cambió la contraseña, mantener la actual
+        cursor.execute('UPDATE usuario SET nombre = %s, email = %s, id_rol = %s WHERE id = %s',
+                       (nombre, email, id_rol, id))
+    
+    mysql.connection.commit()
+    cursor.close()
+
+    flash('Usuario actualizado correctamente', 'success')
+    return redirect(url_for('listar'))  
 
 @app.route('/productos')
 def productos():

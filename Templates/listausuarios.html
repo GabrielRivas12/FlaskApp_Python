@@ -15,7 +15,6 @@
             position: "top-end",
             showConfirmButton: false,
             timer: 2000,
-
             timerProgressBar: true,
             didOpen: (toast) => {
                 toast.onmouseenter = Swal.stopTimer;
@@ -31,7 +30,7 @@
 </ul>
 {% endif %}
 {% endwith %}
-<!--MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2-->
+
 <script>
     function confirmarEliminacion(url) {
         Swal.fire({
@@ -131,6 +130,21 @@
                                            style="border-color: #17a2b8;">
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-user-tag me-1"></i>Rol del usuario
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #ffffff; border-color: #17a2b8;">
+                                        <i class="fas fa-user-tag" style="color: #007bff;"></i>
+                                    </span>
+                                    <select name="id_rol" class="form-select" required style="border-color: #17a2b8;">
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="1">Administrador</option>
+                                        <option value="2">Usuario</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer" style="background-color: #e8f4f8;">
@@ -159,7 +173,7 @@
                        style="background: linear-gradient(90deg, #138496, #17a2b8);">
                     <tr>
                         <th scope="col" class="text-center" style="width: 60px;">#</th>
-                        <th scope="col" style="width: 25%;">
+                        <th scope="col" style="width: 20%;">
                             <i class="fas fa-user me-1"></i>Nombre
                         </th>
                         <th scope="col" style="width: 25%;">
@@ -167,6 +181,9 @@
                         </th>
                         <th scope="col" style="width: 20%;">
                             <i class="fas fa-key me-1"></i>Contraseña
+                        </th>
+                        <th scope="col" style="width: 15%;">
+                            <i class="fas fa-user-tag me-1"></i>Rol
                         </th>
                         <th scope="col" class="text-center" style="width: 200px;">
                             <i class="fas fa-cogs me-1"></i>Acciones
@@ -177,7 +194,7 @@
                     {% for usuario in usuarios %}
                     <tr style="background-color: #f8f9fa;">
                         <td class="text-center fw-bold" style="color: #007bff;">{{ loop.index }}</td>
-                        <td class="text-truncate" style="max-width: 250px;" title="{{ usuario.nombre }}">
+                        <td class="text-truncate" style="max-width: 200px;" title="{{ usuario.nombre }}">
                             {{ usuario.nombre }}
                         </td>
                         <td class="text-truncate" style="max-width: 250px;" title="{{ usuario.email }}">
@@ -187,6 +204,17 @@
                             <span class="badge bg-light text-dark px-3 py-2">
                                 <i class="fas fa-shield-alt me-1"></i>{{ usuario.password }}
                             </span>
+                        </td>
+                        <td>
+                            {% if usuario.id_rol == 1 %}
+                                <span class="badge bg-danger px-3 py-2">
+                                    <i class="fas fa-user-shield me-1"></i>Administrador
+                                </span>
+                            {% else %}
+                                <span class="badge bg-primary px-3 py-2">
+                                    <i class="fas fa-user me-1"></i>Usuario
+                                </span>
+                            {% endif %}
                         </td>
                         <td class="text-center">
                             <div class="btn-group btn-group-sm" role="group">
@@ -241,6 +269,18 @@
                                             <input type="text" name="password" class="form-control"
                                                 value="{{ usuario.password }}" required
                                                 style="border-color: #17a2b8;">
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>La contraseña se almacena encriptada
+                                            </small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                                <i class="fas fa-user-tag me-1"></i>Rol
+                                            </label>
+                                            <select name="id_rol" class="form-select" required style="border-color: #17a2b8;">
+                                                <option value="1" {% if usuario.id_rol == 1 %}selected{% endif %}>Administrador</option>
+                                                <option value="2" {% if usuario.id_rol == 2 %}selected{% endif %}>Usuario</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="modal-footer" style="background-color: #e8f4f8;">
