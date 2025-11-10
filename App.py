@@ -33,7 +33,32 @@ def administrador():
     if 'id_rol' not in session or session['id_rol'] != 1:
         flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
         return redirect(url_for('login'))
-    return render_template('admin.html')
+    
+    cursor = mysql.connection.cursor()
+    
+    # Obtener conteo de usuarios
+    cursor.execute('SELECT COUNT(*) as total FROM usuario')
+    total_usuarios = cursor.fetchone()['total']
+    
+    # Obtener conteo de productos/viajes
+    cursor.execute('SELECT COUNT(*) as total FROM productos')
+    total_productos = cursor.fetchone()['total']
+    
+    # Obtener conteo de reservaciones/habitaciones
+    cursor.execute('SELECT COUNT(*) as total FROM reservaciones')
+    total_reservaciones = cursor.fetchone()['total']
+    
+    # DEBUG: Mostrar en consola para verificar
+    print(f"DEBUG - Total usuarios: {total_usuarios}")
+    print(f"DEBUG - Total productos: {total_productos}") 
+    print(f"DEBUG - Total reservaciones: {total_reservaciones}")
+    
+    cursor.close()
+    
+    return render_template('admin.html', 
+                         total_usuarios=total_usuarios,
+                         total_productos=total_productos,
+                         total_reservaciones=total_reservaciones)
 
 @app.route('/listar')
 def listar():
@@ -179,14 +204,43 @@ def eliminar_producto(id):
         return redirect(url_for('login'))
     
     cursor = mysql.connection.cursor()
-    cursor.execute('DELETE FROM reservaciones WHERE id = %s', (id,))
+    cursor.execute('DELETE FROM productos WHERE id = %s', (id,))
     mysql.connection.commit()
     cursor.close()
-    flash('Reservación eliminada correctamente', 'success')
-    return redirect(url_for('editar'))
+    flash('Producto eliminado correctamente', 'success')
+    return redirect(url_for('productos'))
 
-@app.route('/editar_producto_modal/<int:id>', methods=['POST'])
-def editar_producto_modal(id):
+# FUNCIÓN CORREGIDA PARA EDITAR PRODUCTOS
+@app.route('/editar_producto/<int:id>', methods=['POST'])
+def editar_producto(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
+    nombre = request.form['nombre']
+    precio = request.form['precio']
+    descripcion = request.form['descripcion']
+    origen = request.form['origen']
+    destino = request.form['destino']
+    fecha_salida = request.form['fecha_salida']
+    fecha_regreso = request.form['fecha_regreso']
+    aerolinea = request.form['aerolinea']
+
+    cursor = mysql.connection.cursor()
+    cursor.execute('''UPDATE productos SET 
+                   nombre = %s, precio = %s, descripcion = %s, origen = %s, 
+                   destino = %s, fecha_salida = %s, fecha_regreso = %s, aerolinea = %s 
+                   WHERE id = %s''',
+                   (nombre, precio, descripcion, origen, destino, fecha_salida, fecha_regreso, aerolinea, id))
+    mysql.connection.commit()
+    cursor.close()
+
+    flash('Producto actualizado correctamente', 'success')
+    return redirect(url_for('productos'))
+
+# FUNCIÓN PARA EDITAR RESERVACIONES (separada)
+@app.route('/editar_reservacion/<int:id>', methods=['POST'])
+def editar_reservacion(id):
     if 'id_rol' not in session or session['id_rol'] != 1:
         flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
         return redirect(url_for('login'))
@@ -255,10 +309,6 @@ def editar():
 
     reservaciones_list = cursor.fetchall()
     cursor.close()
-
-    # DEBUG: Verificar en consola
-    print(f"DEBUG - Página: {page}, Total: {total}, Páginas: {pages}, Por página: {per_page}")
-    print(f"DEBUG - Reservaciones en esta página: {len(reservaciones_list)}")
 
     # Crear objeto de paginación
     class Pagination:
@@ -458,6 +508,33 @@ def contactopost():
        usuario['email'] = request.form.get('email')
        usuario['mensaje'] = request.form.get('mensaje')
     return render_template('Contactopost.html', user=usuario)
+
+# FUNCIÓN PARA EDITAR RESERVACIONES (MANTENER ESTA PARA EL TEMPLATE editarproductos.html)
+@app.route('/editar_producto_modal/<int:id>', methods=['POST'])
+def editar_producto_modal(id):
+    if 'id_rol' not in session or session['id_rol'] != 1:
+        flash('Acceso denegado. Se requieren privilegios de administrador.', 'danger')
+        return redirect(url_for('login'))
+    
+    nombrelugar = request.form['nombrelugar']
+    nhabitacion = request.form['nhabitacion']
+    tipohabitacion = request.form['tipohabitacion']
+    cantidadh = request.form['cantidadh']
+    precionoche = request.form['precionoche']
+    descripcion = request.form['descripcion']
+    ubicacion = request.form['ubicacion']
+
+    cursor = mysql.connection.cursor()
+    cursor.execute('''UPDATE reservaciones SET 
+                   nombrelugar = %s, nhabitacion = %s, tipohabitacion = %s, cantidadh = %s, 
+                   precionoche = %s, descripcion = %s, ubicacion = %s 
+                   WHERE id = %s''',
+                   (nombrelugar, nhabitacion, tipohabitacion, cantidadh, precionoche, descripcion, ubicacion, id))
+    mysql.connection.commit()
+    cursor.close()
+
+    flash('Reservación actualizada correctamente', 'success')
+    return redirect(url_for('editar'))
 
 @app.route('/about')
 def about():

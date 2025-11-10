@@ -67,6 +67,13 @@
                                     <i class="fas fa-users me-2"></i>Gestión de Usuarios
                                 </h5>
                                 <p class="card-text small">Administrar usuarios del sistema</p>
+                                <!-- AQUÍ SE MUESTRA EL CONTEO DE USUARIOS -->
+                                <div class="mb-2">
+                                    <span class="badge bg-light text-primary fs-6">
+                                        <i class="fas fa-user-friends me-1"></i>
+                                        {{ total_usuarios }} usuario{% if total_usuarios != 1 %}s{% endif %}
+                                    </span>
+                                </div>
                                 <a href="{{ url_for('listar')}}" class="btn btn-outline-light btn-sm">
                                     <i class="fas fa-eye me-1"></i>Ver Detalles
                                 </a>
@@ -93,6 +100,13 @@
                                     <i class="fas fa-map-marked-alt me-2"></i>Registrar Viajes
                                 </h5>
                                 <p class="card-text small">Agregar nuevos destinos turísticos</p>
+                                <!-- AQUÍ SE MUESTRA EL CONTEO DE PRODUCTOS/VIAJES -->
+                                <div class="mb-2">
+                                    <span class="badge bg-light text-success fs-6">
+                                        <i class="fas fa-plane me-1"></i>
+                                        {{ total_productos }} destino{% if total_productos != 1 %}s{% endif %}
+                                    </span>
+                                </div>
                                 <a href="{{ url_for('productos') }}" 
                                    class="btn btn-outline-light btn-sm">
                                     <i class="fas fa-plus me-1"></i>Agregar Destino
@@ -122,6 +136,13 @@
                                     <i class="fas fa-list-alt me-2"></i>Habitaciones disponibles
                                 </h5>
                                 <p class="card-text small">Gestionar destinos disponibles</p>
+                                <!-- AQUÍ SE MUESTRA EL CONTEO DE RESERVACIONES/HABITACIONES -->
+                                <div class="mb-2">
+                                    <span class="badge bg-light text-purple fs-6">
+                                        <i class="fas fa-bed me-1"></i>
+                                        {{ total_reservaciones }} habitación{% if total_reservaciones != 1 %}es{% endif %}
+                                    </span>
+                                </div>
                                 <a href="{{ url_for('editar') }}" class="btn btn-outline-light btn-sm">
                                     <i class="fas fa-edit me-1"></i>Gestionar
                                 </a>
@@ -138,7 +159,7 @@
             </div>
         </div>
     </div>
-
+</div>
 
 <style>
     .card {
@@ -162,6 +183,15 @@
     
     .rounded-2 {
         border-radius: 0.75rem !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .text-purple {
+        color: #6f42c1 !important;
     }
 </style>
 {% endblock %}
