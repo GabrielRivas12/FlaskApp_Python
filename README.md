@@ -1,4 +1,4 @@
-# Proyecto Flask
+# Proyecto Nica Explora
 
 Este proyecto está basado en Flask, un micro-framework para Python que facilita la creación de aplicaciones web ligeras y flexibles. Este archivo proporciona las instrucciones necesarias para configurar y ejecutar el proyecto en tu máquina local.
 
@@ -11,8 +11,9 @@ Este proyecto está basado en Flask, un micro-framework para Python que facilita
 
 Sigue estos pasos para configurar el entorno virtual y las dependencias necesarias:
     
-    pip install Flask
-
+- pip install Flask
+- pip freeze > requirements.txt
+- pip install -r requirements.txt
 
 1. **Crear un entorno virtual**:
    
@@ -25,4 +26,9 @@ Sigue estos pasos para configurar el entorno virtual y las dependencias necesari
 2. **Ejecutar el entorno virtual**:
 
     .\venv\Scripts\activate
+
+3. ## Vista principal ##
+
+![alt text] (image.png)
+
 
