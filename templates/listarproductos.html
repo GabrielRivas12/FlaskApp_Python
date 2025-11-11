@@ -1,0 +1,743 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Gestión de Destinos {% endblock titulo %}
+
+{% block body %}
+
+<!--MENSAJE DE ALERTA SweetAlert2 CONFIRMACION-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+    {% for category, message in messages %}
+    <script type="text/javascript">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "{{message}}"
+        });
+    </script>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<div class="container mt-4">
+    <!-- Encabezado Principal con Botón de Agregar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="rounded-3 p-4 shadow-sm text-white"
+            style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+            <h2 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Gestión de Destinos Turísticos</h2>
+        </div>
+        <button type="button" class="btn text-white fw-bold py-2 px-4"
+            style="background: linear-gradient(90deg, #28a745, #20c997); border: none;" data-bs-toggle="modal"
+            data-bs-target="#agregarModal">
+            <i class="fas fa-plus-circle me-2"></i>Agregar Destino
+        </button>
+    </div>
+
+    <!-- Lista de destinos existentes -->
+    <div class="card shadow-lg border-0">
+        <!-- Encabezado de la Lista -->
+        <div class="card-header text-white rounded-top-3 py-3"
+            style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+            <h5 class="mb-0 text-center">
+                <i class="fas fa-list me-2"></i>Destinos Registrados
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="text-white" style="background: linear-gradient(90deg, #138496, #17a2b8);">
+                        <tr>
+                            <th class="text-center" style="width: 60px;">
+                                <i class="fas fa-hashtag"></i>
+                            </th>
+                            <th>
+                                <i class="fas fa-map-pin me-1"></i>Destino
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-plane-departure me-1"></i>Origen
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-plane-arrival me-1"></i>Destino
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-plane me-1"></i>Aerolínea
+                            </th>
+                            <th class="text-center" style="width: 100px;">
+                                <i class="fas fa-dollar-sign me-1"></i>Precio
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-calendar-alt me-1"></i>Salida
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-calendar-check me-1"></i>Regreso
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-calendar-plus me-1"></i>Fecha Registro
+                            </th>
+                            <th class="text-center" style="width: 120px;">
+                                <i class="fas fa-cogs me-1"></i>Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr style="background-color: #f8f9fa;">
+                            <td class="text-center fw-bold text-muted">
+                                {{ producto.id }}
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">
+                                    {{ producto.nombre }}
+                                </div>
+                                {% if producto.descripcion %}
+                                <small class="text-muted">{{ producto.descripcion[:50] }}{% if
+                                    producto.descripcion|length > 50 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td class="text-center text-muted">
+                                {{ producto.origen }}
+                            </td>
+                            <td class="text-center text-muted">
+                                {{ producto.destino }}
+                            </td>
+                            <td class="text-center text-muted">
+                                {{ producto.aerolinea }}
+                            </td>
+                            <td class="text-center fw-bold text-success">
+                                ${{ "%.2f"|format(producto.precio) }}
+                            </td>
+                            <td class="text-center text-muted">
+                                {{ producto.fecha_salida }}
+                            </td>
+                            <td class="text-center text-muted">
+                                {{ producto.fecha_regreso }}
+                            </td>
+                            <td class="text-center text-muted small">
+                                {{ producto.FechaRegistro.strftime('%d/%m/%Y') if producto.FechaRegistro else 'N/A' }}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary btn-editar" data-bs-toggle="modal"
+                                        data-bs-target="#editarModal" data-id="{{ producto.id }}"
+                                        data-nombre="{{ producto.nombre }}" data-precio="{{ producto.precio }}"
+                                        data-descripcion="{{ producto.descripcion or '' }}"
+                                        data-origen="{{ producto.origen }}" data-destino="{{ producto.destino }}"
+                                        data-fecha-salida="{{ producto.fecha_salida }}"
+                                        data-fecha-regreso="{{ producto.fecha_regreso }}"
+                                        data-aerolinea="{{ producto.aerolinea }}" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="{{ url_for('eliminar_producto', id=producto.id) }}"
+                                        class="btn btn-outline-danger"
+                                        onclick="confirmarEliminacion(this.href); return false;" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2 d-block" style="color: #6c757d;"></i>
+                                No hay destinos registrados aún
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar destino -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background: linear-gradient(90deg, #28a745, #20c997);">
+                <h5 class="modal-title" id="agregarModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Agregar Nuevo Destino
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('agregar_producto') }}">
+                <div class="modal-body">
+                    <!-- Nombre del Destino -->
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-map-pin me-2"></i>Nombre del Destino
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                <i class="fas fa-signature" style="color: #007bff;"></i>
+                            </span>
+                            <input type="text" class="form-control" name="nombre" id="nombre"
+                                placeholder="Ej: Playa del Carmen, Machu Picchu..." style="border-color: #17a2b8;"
+                                required
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Ingresa el nombre comercial del destino turístico. Ej: 'Paquete Cancún Todo Incluido'">
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Nombre comercial del paquete turístico
+                        </div>
+                    </div>
+
+                    <!-- Precio -->
+                    <div class="mb-3">
+                        <label for="precio" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-dollar-sign me-2"></i>Precio por Persona
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                <i class="fas fa-tag" style="color: #007bff;"></i>
+                            </span>
+                            <input type="number" step="0.01" class="form-control" name="precio" id="precio" 
+                                placeholder="0.00" min="0" style="border-color: #17a2b8;" required
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Precio total por persona en dólares americanos (USD). Incluye vuelo y hospedaje.">
+                            <span class="input-group-text"
+                                style="background-color: #e8f4f8; border-color: #17a2b8;">USD</span>
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Precio total por persona en dólares
+                        </div>
+                    </div>
+
+                    <!-- Origen y Destino -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="origen" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-plane-departure me-2"></i>Ciudad de Origen
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-location-arrow" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" class="form-control" name="origen" id="origen"
+                                        placeholder="Ej: Ciudad de México" style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Ciudad desde donde parten los vuelos. Ej: 'Ciudad de México', 'Guadalajara', 'Monterrey'">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Ciudad de salida del vuelo
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="destino" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-plane-arrival me-2"></i>Ciudad de Destino
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-map-marker-alt" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" class="form-control" name="destino" id="destino" 
+                                        placeholder="Ej: Cancún" style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Ciudad de destino turístico. Ej: 'Cancún', 'París', 'Tokio'">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Ciudad de llegada del vuelo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fechas -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fecha_salida" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-calendar-alt me-2"></i>Fecha de Salida
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-paper-plane" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="date" class="form-control" name="fecha_salida" id="fecha_salida"
+                                        style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Fecha en que inicia el viaje. Debe ser una fecha futura.">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Fecha de inicio del viaje
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fecha_regreso" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-calendar-alt me-2"></i>Fecha de Regreso
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-home" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="date" class="form-control" name="fecha_regreso" id="fecha_regreso"
+                                        style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Fecha en que finaliza el viaje. Debe ser posterior a la fecha de salida.">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Fecha de regreso del viaje
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aerolínea -->
+                    <div class="mb-3">
+                        <label for="aerolinea" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-plane me-2"></i>Aerolínea
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                <i class="fas fa-building" style="color: #007bff;"></i>
+                            </span>
+                            <input type="text" class="form-control" name="aerolinea" id="aerolinea"
+                                placeholder="Ej: Aeroméxico, Volaris..." style="border-color: #17a2b8;" required
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Nombre de la aerolínea que opera el vuelo. Ej: 'Aeroméxico', 'Volaris', 'Viva Aerobus'">
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Compañía aérea del vuelo
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-4">
+                        <label for="descripcion" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-info-circle me-2"></i>Descripción del Destino
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text align-items-start"
+                                style="background-color: #e8f4f8; border-color: #17a2b8; padding-top: 12px;">
+                                <i class="fas fa-comment" style="color: #007bff;"></i>
+                            </span>
+                            <textarea class="form-control" name="descripcion" id="descripcion" rows="4"
+                                placeholder="Describe las atracciones, actividades y características únicas de este destino..."
+                                style="border-color: #17a2b8;"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Describe detalladamente el paquete turístico. Incluye: atracciones principales, tipo de hospedaje, comidas incluidas, actividades, etc."></textarea>
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Descripción detallada del paquete turístico
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn text-white fw-bold py-2"
+                        style="background: linear-gradient(90deg, #28a745, #20c997); border: none;">
+                        <i class="fas fa-plus-circle me-2"></i>Agregar Destino
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar destino -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                <h5 class="modal-title" id="editarModalLabel">
+                    <i class="fas fa-edit me-2"></i>Editar Destino
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form method="POST" action="" id="form-editar">
+                <div class="modal-body">
+                    <input type="hidden" name="producto_id" id="modal_producto_id">
+
+                    <!-- Nombre del Destino -->
+                    <div class="mb-3">
+                        <label for="modal_nombre" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-map-pin me-2"></i>Nombre del Destino
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                <i class="fas fa-signature" style="color: #007bff;"></i>
+                            </span>
+                            <input type="text" class="form-control" name="nombre" id="modal_nombre"
+                                placeholder="Ej: Playa del Carmen, Machu Picchu..." style="border-color: #17a2b8;"
+                                required
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Ingresa el nombre comercial del destino turístico. Ej: 'Paquete Cancún Todo Incluido'">
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Nombre comercial del paquete turístico
+                        </div>
+                    </div>
+
+                    <!-- Precio -->
+                    <div class="mb-3">
+                        <label for="modal_precio" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-dollar-sign me-2"></i>Precio por Persona
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                <i class="fas fa-tag" style="color: #007bff;"></i>
+                            </span>
+                            <input type="number" step="0.01" class="form-control" name="precio" id="modal_precio"
+                                placeholder="0.00" min="0" style="border-color: #17a2b8;" required
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Precio total por persona en dólares americanos (USD). Incluye vuelo y hospedaje.">
+                            <span class="input-group-text"
+                                style="background-color: #e8f4f8; border-color: #17a2b8;">USD</span>
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Precio total por persona en dólares
+                        </div>
+                    </div>
+
+                    <!-- Origen y Destino -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="modal_origen" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-plane-departure me-2"></i>Ciudad de Origen
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-location-arrow" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" class="form-control" name="origen" id="modal_origen"
+                                        placeholder="Ej: Ciudad de México" style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Ciudad desde donde parten los vuelos. Ej: 'Ciudad de México', 'Guadalajara', 'Monterrey'">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Ciudad de salida del vuelo
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="modal_destino" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-plane-arrival me-2"></i>Ciudad de Destino
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-map-marker-alt" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" class="form-control" name="destino" id="modal_destino"
+                                        placeholder="Ej: Cancún" style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Ciudad de destino turístico. Ej: 'Cancún', 'París', 'Tokio'">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Ciudad de llegada del vuelo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fechas -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="modal_fecha_salida" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-calendar-alt me-2"></i>Fecha de Salida
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-paper-plane" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="date" class="form-control" name="fecha_salida" id="modal_fecha_salida"
+                                        style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Fecha en que inicia el viaje. Debe ser una fecha futura.">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Fecha de inicio del viaje
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="modal_fecha_regreso" class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-calendar-alt me-2"></i>Fecha de Regreso
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"
+                                        style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                        <i class="fas fa-home" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="date" class="form-control" name="fecha_regreso"
+                                        id="modal_fecha_regreso" style="border-color: #17a2b8;" required
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top"
+                                        data-bs-title="Fecha en que finaliza el viaje. Debe ser posterior a la fecha de salida.">
+                                </div>
+                                <div class="form-text text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Fecha de regreso del viaje
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aerolínea -->
+                    <div class="mb-3">
+                        <label for="modal_aerolinea" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-plane me-2"></i>Aerolínea
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #e8f4f8; border-color: #17a2b8;">
+                                <i class="fas fa-building" style="color: #007bff;"></i>
+                            </span>
+                            <input type="text" class="form-control" name="aerolinea" id="modal_aerolinea"
+                                placeholder="Ej: Aeroméxico, Volaris..." style="border-color: #17a2b8;" required
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Nombre de la aerolínea que opera el vuelo. Ej: 'Aeroméxico', 'Volaris', 'Viva Aerobus'">
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Compañía aérea del vuelo
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-4">
+                        <label for="modal_descripcion" class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-info-circle me-2"></i>Descripción del Destino
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text align-items-start"
+                                style="background-color: #e8f4f8; border-color: #17a2b8; padding-top: 12px;">
+                                <i class="fas fa-comment" style="color: #007bff;"></i>
+                            </span>
+                            <textarea class="form-control" name="descripcion" id="modal_descripcion" rows="4"
+                                placeholder="Describe las atracciones, actividades y características únicas de este destino..."
+                                style="border-color: #17a2b8;"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                data-bs-title="Describe detalladamente el paquete turístico. Incluye: atracciones principales, tipo de hospedaje, comidas incluidas, actividades, etc."></textarea>
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>Descripción detallada del paquete turístico
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn text-white"
+                        style="background: linear-gradient(90deg, #28a745, #20c997);">
+                        <i class="fas fa-save me-1"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmarEliminacion(url) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esta acción!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    // Función para cargar datos en el modal de edición
+    document.addEventListener('DOMContentLoaded', function () {
+        const editarModal = document.getElementById('editarModal');
+        const formEditar = document.getElementById('form-editar');
+
+        editarModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            // Obtener datos del botón
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            const precio = button.getAttribute('data-precio');
+            const descripcion = button.getAttribute('data-descripcion');
+            const origen = button.getAttribute('data-origen');
+            const destino = button.getAttribute('data-destino');
+            const fechaSalida = button.getAttribute('data-fecha-salida');
+            const fechaRegreso = button.getAttribute('data-fecha-regreso');
+            const aerolinea = button.getAttribute('data-aerolinea');
+
+            // Llenar el formulario del modal
+            document.getElementById('modal_producto_id').value = id;
+            document.getElementById('modal_nombre').value = nombre;
+            document.getElementById('modal_precio').value = precio;
+            document.getElementById('modal_descripcion').value = descripcion;
+            document.getElementById('modal_origen').value = origen;
+            document.getElementById('modal_destino').value = destino;
+            document.getElementById('modal_fecha_salida').value = fechaSalida;
+            document.getElementById('modal_fecha_regreso').value = fechaRegreso;
+            document.getElementById('modal_aerolinea').value = aerolinea;
+
+            // CORRECCIÓN: Usar la nueva función editar_producto
+            formEditar.action = "{{ url_for('editar_producto', id=0) }}".replace('/0', '/' + id);
+        });
+
+        // Inicializar tooltips de Bootstrap
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'focus hover',
+                delay: { "show": 300, "hide": 100 }
+            });
+        });
+    });
+</script>
+
+<style>
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+
+    .input-group-text {
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within .input-group-text {
+        background-color: #17a2b8 !important;
+        color: white !important;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e8f4f8 !important;
+        transition: all 0.2s ease;
+    }
+
+    .rounded-top-3 {
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+    }
+
+    .card {
+        border-radius: 1rem;
+    }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .btn-editar:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .modal-header {
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Estilos mejorados para tooltips */
+    .tooltip {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .tooltip .tooltip-inner {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-width: 300px;
+    }
+
+    .tooltip.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: #17a2b8;
+    }
+
+    .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: #17a2b8;
+    }
+
+    .tooltip.bs-tooltip-start .tooltip-arrow::before {
+        border-left-color: #17a2b8;
+    }
+
+    .tooltip.bs-tooltip-end .tooltip-arrow::before {
+        border-right-color: #17a2b8;
+    }
+
+    /* Efectos hover mejorados para inputs con tooltips */
+    .form-control[data-bs-toggle="tooltip"]:hover {
+        border-color: #138496;
+    }
+
+    /* Estilo para los textos de ayuda debajo de los inputs */
+    .form-text {
+        font-style: italic;
+        margin-top: 4px;
+        color: #6c757d !important;
+    }
+
+    /* Mejora visual para los labels */
+    .form-label {
+        margin-bottom: 8px;
+    }
+</style>
+
+{% endblock %}

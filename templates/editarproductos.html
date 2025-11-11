@@ -1,0 +1,847 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Gestionar Reservaciones {% endblock titulo %}
+
+{% block body %}
+<!--MENSAJE DE ALERTA SweetAlert2 CONFIRMACION-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+    {% for category, message in messages %}
+    <script type="text/javascript">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "{{message}}"
+        });
+    </script>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<div class="container mt-4">
+
+    <!-- Encabezado -->
+    <div class="rounded-3 p-4 mb-4 shadow-sm text-white text-center"
+        style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+        <h2 class="mb-0"><i class="fas fa-hotel me-2"></i>Gestión de Habitaciones Disponibles</h2>
+    </div>
+
+    <!-- Contenedor para herramientas -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body" style="background-color: #e8f4f8;">
+            <div class="row align-items-center">
+                <!-- Botones de Exportación -->
+                <div class="col-md-6">
+                    <div class="btn-group" role="group">
+                        <button id="btnCopiar" class="btn btn-outline-primary btn-sm" title="Copiar">
+                            <i class="fas fa-copy me-1"></i>Copiar
+                        </button>
+                        <button id="btnExcel" class="btn btn-outline-success btn-sm" title="Exportar a Excel">
+                            <i class="fas fa-file-excel me-1"></i>Excel
+                        </button>
+                        <button id="btnPDF" class="btn btn-outline-danger btn-sm" title="Exportar a PDF">
+                            <i class="fas fa-file-pdf me-1"></i>PDF
+                        </button>
+                        <button id="btnImprimir" class="btn btn-outline-secondary btn-sm" title="Imprimir">
+                            <i class="fas fa-print me-1"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Buscador y filtros -->
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-end gap-2">
+                        <!-- Combo Box para seleccionar cantidad por página -->
+                        <form method="GET" action="{{ url_for('editar') }}" class="d-flex align-items-center">
+                            <label for="por_pagina" class="form-label mb-0 me-2 small fw-semibold"
+                                style="color: #007bff;">Mostrar:</label>
+                            <select name="por_pagina" id="por_pagina" class="form-select form-select-sm border-primary"
+                                style="width: 80px;" onchange="this.form.submit()">
+                                <option value="5" {% if request.args.get('por_pagina', '5')=='5' %}selected{% endif %}>5</option>
+                                <option value="10" {% if request.args.get('por_pagina', '5')=='10' %}selected{% endif %}>10</option>
+                                <option value="25" {% if request.args.get('por_pagina', '5')=='25' %}selected{% endif %}>25</option>
+                                <option value="50" {% if request.args.get('por_pagina', '5')=='50' %}selected{% endif %}>50</option>
+                                <option value="100" {% if request.args.get('por_pagina', '5')=='100' %}selected{% endif %}>100</option>
+                            </select>
+                            <!-- Mantener el parámetro de búsqueda si existe -->
+                            {% if request.args.get('buscar') %}
+                            <input type="hidden" name="buscar" value="{{ request.args.get('buscar') }}">
+                            {% endif %}
+                        </form>
+
+                        <!-- Buscador -->
+                        <form method="GET" action="{{ url_for('editar') }}" class="d-flex">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control border-primary" id="buscar" name="buscar"
+                                    value="{{ request.args.get('buscar', '') }}" placeholder="Buscar reservación..."
+                                    style="width: 200px;">
+                                <button type="submit" class="btn text-white" style="background-color: #007bff;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                {% if request.args.get('buscar') %}
+                                <a href="{{ url_for('editar') }}" class="btn btn-outline-danger" title="Limpiar filtro">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <!-- Mantener el parámetro de cantidad por página si existe -->
+                            {% if request.args.get('por_pagina') %}
+                            <input type="hidden" name="por_pagina" value="{{ request.args.get('por_pagina') }}">
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Reservaciones -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header text-white rounded-top-3 py-3 d-flex justify-content-between align-items-center"
+            style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lista de Reservaciones Disponibles</h5>
+            <!-- Botón para agregar nueva reservación -->
+            <button class="btn btn-light btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevaReservacion">
+                <i class="fas fa-plus me-1"></i>Nueva Reservación
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table id="tablaReservaciones" class="table table-hover align-middle mb-0">
+                <thead class="text-white" style="background: linear-gradient(90deg, #138496, #17a2b8);">
+                    <tr>
+                        <th class="text-center" style="width: 60px;">
+                            <i class="fas fa-hashtag me-1"></i>ID
+                        </th>
+                        <th style="width: 20%;">
+                            <i class="fas fa-hotel me-1"></i>Nombre del Lugar
+                        </th>
+                        <th class="text-center" style="width: 100px;">
+                            <i class="fas fa-door-open me-1"></i>N° Habitación
+                        </th>
+                        <th class="text-center" style="width: 120px;">
+                            <i class="fas fa-bed me-1"></i>Tipo Habitación
+                        </th>
+                        <th class="text-center" style="width: 80px;">
+                            <i class="fas fa-users me-1"></i>Cantidad
+                        </th>
+                        <th class="text-center" style="width: 100px;">
+                            <i class="fas fa-dollar-sign me-1"></i>Precio/Noche
+                        </th>
+                        <th style="width: 25%;">
+                            <i class="fas fa-info-circle me-1"></i>Descripción
+                        </th>
+                        <th class="text-center" style="width: 120px;">
+                            <i class="fas fa-map-marker-alt me-1"></i>Ubicación
+                        </th>
+                        <th class="text-center" style="width: 140px;">
+                            <i class="fas fa-cogs me-1"></i>Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if reservaciones is iterable %}
+                        {% for reservacion in reservaciones %}
+                        <tr style="background-color: #f8f9fa;">
+                            <td class="text-center fw-bold">{{ reservacion.id }}</td>
+                            <td class="fw-semibold">{{ reservacion.nombrelugar }}</td>
+                            <td class="text-center">{{ reservacion.nhabitacion }}</td>
+                            <td class="text-center">{{ reservacion.tipohabitacion }}</td>
+                            <td class="text-center">{{ reservacion.cantidadh }}</td>
+                            <td class="text-center">${{ "%.2f"|format(reservacion.precionoche) }}</td>
+                            <td class="text-truncate" style="max-width: 250px;" title="{{ reservacion.descripcion }}">
+                                {{ reservacion.descripcion }}
+                            </td>
+                            <td class="text-center">{{ reservacion.ubicacion }}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                        data-bs-target="#modalEditar{{ reservacion.id }}" title="Editar reservación">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-eliminar"
+                                        data-url="{{ url_for('eliminar_producto', id=reservacion.id) }}"
+                                        data-nombre="{{ reservacion.nombrelugar }}" title="Eliminar reservación">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for reservacion in reservaciones.items %}
+                        <tr style="background-color: #f8f9fa;">
+                            <td class="text-center fw-bold">{{ reservacion.id }}</td>
+                            <td class="fw-semibold">{{ reservacion.nombrelugar }}</td>
+                            <td class="text-center">{{ reservacion.nhabitacion }}</td>
+                            <td class="text-center">{{ reservacion.tipohabitacion }}</td>
+                            <td class="text-center">{{ reservacion.cantidadh }}</td>
+                            <td class="text-center">${{ "%.2f"|format(reservacion.precionoche) }}</td>
+                            <td class="text-truncate" style="max-width: 250px;" title="{{ reservacion.descripcion }}">
+                                {{ reservacion.descripcion }}
+                            </td>
+                            <td class="text-center">{{ reservacion.ubicacion }}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                        data-bs-target="#modalEditar{{ reservacion.id }}" title="Editar reservación">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-eliminar"
+                                        data-url="{{ url_for('eliminar_producto', id=reservacion.id) }}"
+                                        data-nombre="{{ reservacion.nombrelugar }}" title="Eliminar reservación">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if request.args.get('buscar') %}
+    <div class="alert alert-info mt-3 py-2 border-0 shadow-sm"
+        style="background-color: #e8f4f8; border-left: 4px solid #17a2b8;">
+        <small class="d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fas fa-search me-1"></i>Resultados para: "<strong>{{ request.args.get('buscar') }}</strong>"
+            </span>
+            <span>
+                {% if reservaciones is iterable %}
+                    Página <strong>1</strong> de <strong>1</strong>
+                {% else %}
+                    Página <strong>{{ reservaciones.page }}</strong> de <strong>{{ reservaciones.pages }}</strong>
+                {% endif %}
+            </span>
+        </small>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-3 py-2 border-0 shadow-sm"
+        style="background-color: #e8f4f8; border-left: 4px solid #17a2b8;">
+        <small class="d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fas fa-chart-bar me-1"></i>
+                {% if reservaciones is iterable %}
+                    Mostrando <strong>{{ reservaciones|length }}</strong> de <strong>{{ reservaciones|length }}</strong> reservaciones
+                {% else %}
+                    Mostrando <strong>{{ reservaciones.items|length }}</strong> de <strong>{{ reservaciones.total }}</strong> reservaciones
+                {% endif %}
+            </span>
+            <span>
+                {% if reservaciones is iterable %}
+                    Página <strong>1</strong> de <strong>1</strong>
+                {% else %}
+                    Página <strong>{{ reservaciones.page }}</strong> de <strong>{{ reservaciones.pages }}</strong>
+                {% endif %}
+            </span>
+        </small>
+    </div>
+    {% endif %}
+
+    <!-- Paginador -->
+    {% if not (reservaciones is iterable) and reservaciones.pages > 1 %}
+    <nav aria-label="Paginación de reservaciones" class="mt-3">
+        <ul class="pagination justify-content-center">
+            <!-- Botón Anterior -->
+            <li class="page-item {% if not reservaciones.has_prev %}disabled{% endif %}">
+                <a class="page-link border-primary text-primary"
+                    href="{{ url_for('editar', page=reservaciones.prev_num, buscar=request.args.get('buscar', ''), por_pagina=request.args.get('por_pagina', '5')) }}"
+                    aria-label="Anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+
+            <!-- Páginas -->
+            {% for page_num in reservaciones.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+            {% if page_num %}
+            <li class="page-item {% if page_num == reservaciones.page %}active{% endif %}">
+                <a class="page-link {% if page_num == reservaciones.page %}text-white{% else %}text-primary{% endif %} border-primary"
+                    {% if page_num==reservaciones.page %}style="background: linear-gradient(90deg, #007bff, #17a2b8); border-color: #007bff;" {% endif %}
+                    href="{{ url_for('editar', page=page_num, buscar=request.args.get('buscar', ''), por_pagina=request.args.get('por_pagina', '5')) }}">
+                    {{ page_num }}
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link border-primary text-muted">...</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Botón Siguiente -->
+            <li class="page-item {% if not reservaciones.has_next %}disabled{% endif %}">
+                <a class="page-link border-primary text-primary"
+                    href="{{ url_for('editar', page=reservaciones.next_num, buscar=request.args.get('buscar', ''), por_pagina=request.args.get('por_pagina', '5')) }}"
+                    aria-label="Siguiente">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Modal para Nueva Reservación -->
+<div class="modal fade" id="modalNuevaReservacion" tabindex="-1" aria-labelledby="modalNuevaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" action="{{ url_for('agregar_reservacion') }}">
+                <div class="modal-header text-white rounded-top-3"
+                    style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                    <h5 class="modal-title" id="modalNuevaLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Nueva Reservación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" style="background-color: #f8f9fa;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-hotel me-1"></i>Nombre del Lugar
+                                </label>
+                                <input type="text" name="nombrelugar" class="form-control border-primary" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-door-open me-1"></i>Número de Habitación
+                                </label>
+                                <input type="text" name="nhabitacion" class="form-control border-primary" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-bed me-1"></i>Tipo de Habitación
+                                </label>
+                                <select name="tipohabitacion" class="form-control border-primary" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="Individual">Individual</option>
+                                    <option value="Doble">Doble</option>
+                                    <option value="Suite">Suite</option>
+                                    <option value="Familiar">Familiar</option>
+                                    <option value="Presidencial">Presidencial</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-users me-1"></i>Cantidad de Huéspedes
+                                </label>
+                                <input type="number" name="cantidadh" class="form-control border-primary" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-dollar-sign me-1"></i>Precio por Noche
+                                </label>
+                                <input type="number" step="0.01" name="precionoche" class="form-control border-primary" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Ubicación
+                                </label>
+                                <input type="text" name="ubicacion" class="form-control border-primary" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-info-circle me-1"></i>Descripción
+                        </label>
+                        <textarea name="descripcion" class="form-control border-primary" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background-color: #e8f4f8;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn text-white fw-bold"
+                        style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+                        <i class="fas fa-save me-1"></i>Guardar Reservación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modales de Edición -->
+{% if reservaciones is iterable %}
+    {% for reservacion in reservaciones %}
+    <div class="modal fade" id="modalEditar{{ reservacion.id }}" tabindex="-1" aria-labelledby="modalLabel{{ reservacion.id }}"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <form method="POST" action="{{ url_for('editar_producto_modal', id=reservacion.id) }}">
+                    <div class="modal-header text-white rounded-top-3"
+                        style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                        <h5 class="modal-title" id="modalLabel{{ reservacion.id }}">
+                            <i class="fas fa-edit me-2"></i>Editar Reservación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body" style="background-color: #f8f9fa;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-hotel me-1"></i>Nombre del Lugar
+                                    </label>
+                                    <input type="text" name="nombrelugar" class="form-control border-primary"
+                                        value="{{ reservacion.nombrelugar }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-door-open me-1"></i>Número de Habitación
+                                    </label>
+                                    <input type="text" name="nhabitacion" class="form-control border-primary"
+                                        value="{{ reservacion.nhabitacion }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-bed me-1"></i>Tipo de Habitación
+                                    </label>
+                                    <select name="tipohabitacion" class="form-control border-primary" required>
+                                        <option value="Individual" {% if reservacion.tipohabitacion=='Individual' %}selected{% endif %}>Individual</option>
+                                        <option value="Doble" {% if reservacion.tipohabitacion=='Doble' %}selected{% endif %}>Doble</option>
+                                        <option value="Suite" {% if reservacion.tipohabitacion=='Suite' %}selected{% endif %}>Suite</option>
+                                        <option value="Familiar" {% if reservacion.tipohabitacion=='Familiar' %}selected{% endif %}>Familiar</option>
+                                        <option value="Presidencial" {% if reservacion.tipohabitacion=='Presidencial' %}selected{% endif %}>Presidencial</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-users me-1"></i>Cantidad de Huéspedes
+                                    </label>
+                                    <input type="number" name="cantidadh" class="form-control border-primary"
+                                        value="{{ reservacion.cantidadh }}" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-dollar-sign me-1"></i>Precio por Noche
+                                    </label>
+                                    <input type="number" step="0.01" name="precionoche" class="form-control border-primary"
+                                        value="{{ reservacion.precionoche }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Ubicación
+                                    </label>
+                                    <input type="text" name="ubicacion" class="form-control border-primary"
+                                        value="{{ reservacion.ubicacion }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-info-circle me-1"></i>Descripción
+                            </label>
+                            <textarea name="descripcion" class="form-control border-primary" rows="3"
+                                required>{{ reservacion.descripcion }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: #e8f4f8;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn text-white fw-bold"
+                            style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+                            <i class="fas fa-save me-1"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    {% for reservacion in reservaciones.items %}
+    <div class="modal fade" id="modalEditar{{ reservacion.id }}" tabindex="-1" aria-labelledby="modalLabel{{ reservacion.id }}"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <form method="POST" action="{{ url_for('editar_producto_modal', id=reservacion.id) }}">
+                    <div class="modal-header text-white rounded-top-3"
+                        style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                        <h5 class="modal-title" id="modalLabel{{ reservacion.id }}">
+                            <i class="fas fa-edit me-2"></i>Editar Reservación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body" style="background-color: #f8f9fa;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-hotel me-1"></i>Nombre del Lugar
+                                    </label>
+                                    <input type="text" name="nombrelugar" class="form-control border-primary"
+                                        value="{{ reservacion.nombrelugar }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-door-open me-1"></i>Número de Habitación
+                                    </label>
+                                    <input type="text" name="nhabitacion" class="form-control border-primary"
+                                        value="{{ reservacion.nhabitacion }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-bed me-1"></i>Tipo de Habitación
+                                    </label>
+                                    <select name="tipohabitacion" class="form-control border-primary" required>
+                                        <option value="Individual" {% if reservacion.tipohabitacion=='Individual' %}selected{% endif %}>Individual</option>
+                                        <option value="Doble" {% if reservacion.tipohabitacion=='Doble' %}selected{% endif %}>Doble</option>
+                                        <option value="Suite" {% if reservacion.tipohabitacion=='Suite' %}selected{% endif %}>Suite</option>
+                                        <option value="Familiar" {% if reservacion.tipohabitacion=='Familiar' %}selected{% endif %}>Familiar</option>
+                                        <option value="Presidencial" {% if reservacion.tipohabitacion=='Presidencial' %}selected{% endif %}>Presidencial</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-users me-1"></i>Cantidad de Huéspedes
+                                    </label>
+                                    <input type="number" name="cantidadh" class="form-control border-primary"
+                                        value="{{ reservacion.cantidadh }}" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-dollar-sign me-1"></i>Precio por Noche
+                                    </label>
+                                    <input type="number" step="0.01" name="precionoche" class="form-control border-primary"
+                                        value="{{ reservacion.precionoche }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #007bff;">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Ubicación
+                                    </label>
+                                    <input type="text" name="ubicacion" class="form-control border-primary"
+                                        value="{{ reservacion.ubicacion }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-info-circle me-1"></i>Descripción
+                            </label>
+                            <textarea name="descripcion" class="form-control border-primary" rows="3"
+                                required>{{ reservacion.descripcion }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: #e8f4f8;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn text-white fw-bold"
+                            style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+                            <i class="fas fa-save me-1"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabla = document.getElementById("tablaReservaciones");
+
+        // 📋 COPIAR
+        document.getElementById("btnCopiar").addEventListener("click", function () {
+            let texto = "";
+            tabla.querySelectorAll("tr").forEach(fila => {
+                const celdas = Array.from(fila.querySelectorAll("th, td"))
+                    .map(td => td.innerText.trim())
+                    .filter((_, index) => index !== 8); // Excluir columna de acciones
+                texto += celdas.join("\t") + "\n";
+            });
+
+            navigator.clipboard.writeText(texto).then(() => {
+                Swal.fire({
+                    title: '¡Copiado!',
+                    text: 'La tabla ha sido copiada al portapapeles',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+                Swal.fire('Error', 'No se pudo copiar la tabla', 'error');
+            });
+        });
+
+        // 📊 EXPORTAR A EXCEL
+        document.getElementById("btnExcel").addEventListener("click", function () {
+            // Clonar la tabla para eliminar la columna de acciones
+            const tablaClonada = tabla.cloneNode(true);
+            tablaClonada.querySelectorAll('tr').forEach(fila => {
+                const celdas = fila.querySelectorAll('th, td');
+                if (celdas.length > 8) {
+                    celdas[8].remove(); // Eliminar columna de acciones
+                }
+            });
+
+            const wb = XLSX.utils.table_to_book(tablaClonada, { sheet: "Reservaciones" });
+            XLSX.writeFile(wb, "reservaciones_hotel.xlsx");
+
+            Swal.fire({
+                title: '¡Exportado!',
+                text: 'Las reservaciones han sido exportadas a Excel',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+
+        // 📄 EXPORTAR A PDF
+        document.getElementById("btnPDF").addEventListener("click", function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFillColor(0, 123, 255);
+            doc.rect(0, 0, 210, 15, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.text("Lista de Reservaciones", 105, 10, { align: 'center' });
+
+            // Preparar datos excluyendo la columna de acciones
+            const headers = [];
+            const rows = [];
+
+            // Encabezados (excluyendo "Acciones")
+            tabla.querySelectorAll('thead th').forEach((th, index) => {
+                if (index !== 8) { // Excluir columna de acciones
+                    headers.push(th.innerText);
+                }
+            });
+
+            // Filas de datos
+            tabla.querySelectorAll('tbody tr').forEach(tr => {
+                const row = [];
+                tr.querySelectorAll('td').forEach((td, index) => {
+                    if (index !== 8) { // Excluir columna de acciones
+                        row.push(td.innerText);
+                    }
+                });
+                rows.push(row);
+            });
+
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 25,
+                styles: { fontSize: 8 },
+                headStyles: {
+                    fillColor: [23, 162, 184],
+                    textColor: 255
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 249, 250]
+                }
+            });
+
+            doc.save("reservaciones_hotel.pdf");
+
+            Swal.fire({
+                title: '¡Exportado!',
+                text: 'Las reservaciones han sido exportadas a PDF',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+
+        // 🖨️ IMPRIMIR
+        document.getElementById("btnImprimir").addEventListener("click", function () {
+            const printWindow = window.open("", "_blank");
+            const tablaClonada = tabla.cloneNode(true);
+
+            // Remover columna de acciones para impresión
+            tablaClonada.querySelectorAll('tr').forEach(fila => {
+                const celdas = fila.querySelectorAll('th, td');
+                if (celdas.length > 8) {
+                    celdas[8].remove();
+                }
+            });
+
+            printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Lista de Reservaciones</title>
+                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+                    <style>
+                        body { padding: 20px; font-family: Arial, sans-serif; }
+                        h2 { color: #007bff; margin-bottom: 20px; text-align: center; }
+                        .table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        .table th { background: linear-gradient(90deg, #007bff, #17a2b8); color: white; padding: 8px; }
+                        .table td { padding: 6px; border-bottom: 1px solid #dee2e6; }
+                        .badge { padding: 3px 6px; border-radius: 4px; font-size: 11px; }
+                        @media print {
+                            .table { font-size: 10px; }
+                            body { margin: 0; padding: 10px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2><i class="fas fa-hotel me-2"></i>Lista de Reservaciones</h2>
+                    ${tablaClonada.outerHTML}
+                    <script>
+                        window.onload = function() { 
+                            window.print(); 
+                            setTimeout(function() { window.close(); }, 100);
+                        }
+                    <\/script>
+                </body>
+            </html>
+        `);
+            printWindow.document.close();
+        });
+
+        // 🗑️ ELIMINAR RESERVACIÓN CON SWEETALERT
+        document.querySelectorAll('.btn-eliminar').forEach(button => {
+            button.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                const nombre = this.getAttribute('data-nombre');
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    html: `¿Deseas eliminar la reservación <strong>"${nombre}"</strong>?<br><small>Esta acción no se puede deshacer.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '<i class="fas fa-trash me-1"></i>Sí, eliminar',
+                    cancelButtonText: '<i class="fas fa-times me-1"></i>Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-danger mx-2',
+                        cancelButton: 'btn btn-secondary mx-2'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar mensaje de confirmación antes de redirigir
+                        Swal.fire({
+                            title: '¡Eliminado!',
+                            text: `La reservación "${nombre}" ha sido eliminada correctamente.`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Redirigir a la URL de eliminación
+                            window.location.href = url;
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<style>
+    .btn:hover {
+        transform: translateY(-1px);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e8f4f8 !important;
+        transition: all 0.2s ease;
+    }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .rounded-top-3 {
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+    }
+
+    .modal-content {
+        border-radius: 1rem;
+    }
+
+    .page-link:hover {
+        transform: translateY(-1px);
+        transition: all 0.3s ease;
+    }
+</style>
+
+{% endblock %}

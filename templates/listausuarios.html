@@ -1,0 +1,348 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Lista usuarios {% endblock titulo %}
+
+{% block body %}
+
+<!--MENSAJE DE ALERTA SweetAlert2 CONFIRMACION-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class=flashes>
+    {% for category, message in messages %}
+    <script type="text/javascript">
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "{{message}}"
+        });
+    </script>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<script>
+    function confirmarEliminacion(url) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+
+<div class="container mt-4">
+
+    <!-- Encabezado -->
+    <div class="rounded-3 p-4 mb-4 shadow-sm text-white text-center"
+         style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+        <h2 class="mb-0"><i class="fas fa-users me-2"></i>Gestión de Usuarios</h2>
+        <p class="mb-0 mt-2 opacity-75">Administra los usuarios del sistema</p>
+    </div>
+
+    <!-- Botón Agregar Usuario -->
+    <div class="d-flex justify-content-end mb-4">
+        <button class="btn text-white fw-bold px-4 py-2" 
+                data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario"
+                style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+            <i class="fas fa-user-plus me-2"></i>Agregar Usuario
+        </button>
+    </div>
+
+    <!-- Modal Agregar Usuario -->
+    <div class="modal fade" id="modalAgregarUsuario" tabindex="-1" aria-labelledby="modalAgregarUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white rounded-top-3"
+                     style="background: linear-gradient(90deg, #28a745, #20c997);">
+                    <h5 class="modal-title" id="modalAgregarUsuarioLabel">
+                        <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('agregar_usuario') }}">
+                    <div class="modal-body" style="background-color: #f8f9fa;">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-user me-1"></i>Nombre completo
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #ffffff; border-color: #17a2b8;">
+                                        <i class="fas fa-user" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" name="nombre" class="form-control" placeholder="Ingrese el nombre completo" required
+                                           style="border-color: #17a2b8;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-envelope me-1"></i>Correo electrónico
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #ffffff; border-color: #17a2b8;">
+                                        <i class="fas fa-envelope" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="email" name="email" class="form-control" placeholder="ejemplo@correo.com" required
+                                           style="border-color: #17a2b8;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-lock me-1"></i>Contraseña
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #ffffff; border-color: #17a2b8;">
+                                        <i class="fas fa-lock" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" name="password" class="form-control" placeholder="Ingrese la contraseña" required
+                                           style="border-color: #17a2b8;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-lock me-1"></i>Confirmar contraseña
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #ffffff; border-color: #17a2b8;">
+                                        <i class="fas fa-lock" style="color: #007bff;"></i>
+                                    </span>
+                                    <input type="text" name="confirm_password" class="form-control" placeholder="Confirme la contraseña" required
+                                           style="border-color: #17a2b8;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="color: #007bff;">
+                                    <i class="fas fa-user-tag me-1"></i>Rol del usuario
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #ffffff; border-color: #17a2b8;">
+                                        <i class="fas fa-user-tag" style="color: #007bff;"></i>
+                                    </span>
+                                    <select name="id_rol" class="form-select" required style="border-color: #17a2b8;">
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="1">Administrador</option>
+                                        <option value="2">Usuario</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: #e8f4f8;">
+                        <button type="submit" class="btn text-white fw-bold px-4"
+                                style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+                            <i class="fas fa-save me-1"></i>Guardar Usuario
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header text-white rounded-top-3 py-3"
+             style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lista de Usuarios Registrados</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
+                <thead class="text-white"
+                       style="background: linear-gradient(90deg, #138496, #17a2b8);">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 60px;">#</th>
+                        <th scope="col" style="width: 20%;">
+                            <i class="fas fa-user me-1"></i>Nombre
+                        </th>
+                        <th scope="col" style="width: 25%;">
+                            <i class="fas fa-envelope me-1"></i>Correo
+                        </th>
+                        <th scope="col" style="width: 20%;">
+                            <i class="fas fa-key me-1"></i>Contraseña
+                        </th>
+                        <th scope="col" style="width: 15%;">
+                            <i class="fas fa-user-tag me-1"></i>Rol
+                        </th>
+                        <th scope="col" class="text-center" style="width: 200px;">
+                            <i class="fas fa-cogs me-1"></i>Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr style="background-color: #f8f9fa;">
+                        <td class="text-center fw-bold" style="color: #007bff;">{{ loop.index }}</td>
+                        <td class="text-truncate" style="max-width: 200px;" title="{{ usuario.nombre }}">
+                            {{ usuario.nombre }}
+                        </td>
+                        <td class="text-truncate" style="max-width: 250px;" title="{{ usuario.email }}">
+                            {{ usuario.email }}
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <i class="fas fa-shield-alt me-1"></i>{{ usuario.password }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if usuario.id_rol == 1 %}
+                                <span class="badge bg-danger px-3 py-2">
+                                    <i class="fas fa-user-shield me-1"></i>Administrador
+                                </span>
+                            {% else %}
+                                <span class="badge bg-primary px-3 py-2">
+                                    <i class="fas fa-user me-1"></i>Usuario
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                                    data-bs-target="#modalEditar{{ usuario.id }}">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </button>
+                                <a href="{{ url_for('eliminar_usuario', id=usuario.id) }}" 
+                                   class="btn btn-outline-danger"
+                                   onclick="confirmarEliminacion(this.href); return false;">
+                                    <i class="fas fa-trash me-1"></i>Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Modal de Edición -->
+                    <div class="modal fade" id="modalEditar{{ usuario.id }}" tabindex="-1"
+                        aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <form method="POST" action="{{ url_for('editar_usuario_modal', id=usuario.id) }}">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header text-white rounded-top-3"
+                                         style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                                        <h5 class="modal-title" id="modalLabel{{ usuario.id }}">
+                                            <i class="fas fa-edit me-2"></i>Editar Usuario
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                            aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body" style="background-color: #f8f9fa;">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                                <i class="fas fa-user me-1"></i>Nombre
+                                            </label>
+                                            <input type="text" name="nombre" class="form-control"
+                                                value="{{ usuario.nombre }}" required
+                                                style="border-color: #17a2b8;">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                                <i class="fas fa-envelope me-1"></i>Correo
+                                            </label>
+                                            <input type="email" name="email" class="form-control"
+                                                value="{{ usuario.email }}" required
+                                                style="border-color: #17a2b8;">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                                <i class="fas fa-lock me-1"></i>Contraseña
+                                            </label>
+                                            <input type="text" name="password" class="form-control"
+                                                value="{{ usuario.password }}" required
+                                                style="border-color: #17a2b8;">
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>La contraseña se almacena encriptada
+                                            </small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                                <i class="fas fa-user-tag me-1"></i>Rol
+                                            </label>
+                                            <select name="id_rol" class="form-select" required style="border-color: #17a2b8;">
+                                                <option value="1" {% if usuario.id_rol == 1 %}selected{% endif %}>Administrador</option>
+                                                <option value="2" {% if usuario.id_rol == 2 %}selected{% endif %}>Usuario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer" style="background-color: #e8f4f8;">
+                                        <button type="submit" class="btn text-white fw-bold"
+                                                style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;">
+                                            <i class="fas fa-save me-1"></i>Guardar Cambios
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-1"></i>Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn:hover {
+        transform: translateY(-1px);
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+    
+    .input-group-text {
+        transition: all 0.3s ease;
+    }
+    
+    .input-group:focus-within .input-group-text {
+        background-color: #17a2b8 !important;
+        color: white !important;
+    }
+    
+    .rounded-top-3 {
+        border-top-left-radius: 1rem !important;
+        border-top-right-radius: 1rem !important;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: #e8f4f8 !important;
+        transition: all 0.2s ease;
+    }
+    
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .modal-content {
+        border-radius: 1rem;
+    }
+</style>
+{% endblock %}

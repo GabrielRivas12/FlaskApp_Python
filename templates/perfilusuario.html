@@ -1,0 +1,349 @@
+{% extends "baseadmin.html" %}
+
+{% block titulo %} Perfil de Usuario - Viajes Explora {% endblock titulo %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Columna izquierda - Información principal -->
+        <div class="col-lg-4 mb-4">
+            <!-- Tarjeta de perfil -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white rounded-top-3 py-4 text-center"
+                     style="background: linear-gradient(140deg, #007bff, #17a2b8, #138496);">
+                    <div class="position-relative d-inline-block">
+                        <!-- Avatar -->
+                        <div class="avatar-container rounded-circle shadow-lg border-4 border-white mx-auto mb-3">
+                            <img src="{{ url_for('static', filename='img/default-avatar.png') }}" 
+                                 class="avatar-img" 
+                                 alt="Avatar de {{ nombre }}">
+                        </div>
+                        <!-- Badge de rol -->
+                        <div class="position-absolute top-0 end-0">
+                            <span class="badge bg-warning text-dark px-3 py-2 shadow-sm">
+                                <i class="fas fa-crown me-1"></i>
+                                {% if session.id_rol == 1 %}
+                                Administrador
+                                {% else %}
+                                Viajero
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <h4 class="mb-1">{{ nombre }}</h4>
+                    <p class="mb-0 opacity-75">
+                        <i class="fas fa-map-marker-alt me-1"></i>Miembro desde 2024
+                    </p>
+                </div>
+                
+                <div class="card-body text-center">
+                    <button class="btn w-100 mt-3 text-white fw-bold py-2"
+                            style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;"
+                            data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+                        <i class="fas fa-user-edit me-2"></i>Editar Perfil
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha - Información detallada -->
+        <div class="col-lg-8">
+            <!-- Tarjeta de información personal -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white rounded-top-3 py-3"
+                     style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Información de contacto -->
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start p-3 rounded-3" style="background-color: #e8f4f8;">
+                                <div class="icon-container bg-primary rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted d-block fw-semibold">Nombre completo</small>
+                                    <strong class="text-dark fs-6">{{ nombre }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start p-3 rounded-3" style="background-color: #e8f4f8;">
+                                <div class="icon-container bg-success rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0">
+                                    <i class="fas fa-envelope text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted d-block fw-semibold">Correo electrónico</small>
+                                    <strong class="text-dark fs-6">{{ email }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de seguridad -->
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start p-3 rounded-3" style="background-color: #e8f4f8;">
+                                <div class="icon-container bg-warning rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0">
+                                    <i class="fas fa-shield-alt text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted d-block fw-semibold">Contraseña</small>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <strong class="text-dark me-2">••••••••</strong>
+                                        <button class="btn btn-outline-warning btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#cambiarPasswordModal">
+                                            <i class="fas fa-edit me-1"></i>Cambiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start p-3 rounded-3" style="background-color: #e8f4f8;">
+                                <div class="icon-container bg-info rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0">
+                                    <i class="fas fa-user-tag text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted d-block fw-semibold">Tipo de cuenta</small>
+                                    <strong class="text-dark fs-6">
+                                        {% if session.id_rol == 1 %}
+                                        <span class="badge bg-gradient-primary">Administrador</span>
+                                        {% else %}
+                                        <span class="badge bg-gradient-secondary">Viajero</span>
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Perfil -->
+<div class="modal fade" id="editarPerfilModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header text-white rounded-top-3"
+                 style="background: linear-gradient(90deg, #007bff, #17a2b8);">
+                <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Editar Perfil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background-color: #f8f9fa;">
+                <form id="formEditarPerfil">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-user me-1"></i>Nombre completo
+                            </label>
+                            <input type="text" class="form-control border-primary" value="{{ nombre }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold" style="color: #007bff;">
+                                <i class="fas fa-envelope me-1"></i>Correo electrónico
+                            </label>
+                            <input type="email" class="form-control border-primary" value="{{ email }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-camera me-1"></i>Foto de perfil
+                        </label>
+                        <input type="file" class="form-control border-primary" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-info-circle me-1"></i>Biografía
+                        </label>
+                        <textarea class="form-control border-primary" rows="3" placeholder="Cuéntanos sobre tus experiencias de viaje..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #e8f4f8;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn text-white fw-bold"
+                        style="background: linear-gradient(90deg, #007bff, #17a2b8); border: none;"
+                        onclick="guardarCambios()">
+                    <i class="fas fa-save me-1"></i>Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cambiar Contraseña -->
+<div class="modal fade" id="cambiarPasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header text-white rounded-top-3"
+                 style="background: linear-gradient(90deg, #ffc107, #fd7e14);">
+                <h5 class="modal-title"><i class="fas fa-shield-alt me-2"></i>Cambiar Contraseña</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background-color: #f8f9fa;">
+                <form id="formCambiarPassword">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-lock me-1"></i>Contraseña actual
+                        </label>
+                        <input type="password" class="form-control border-primary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-key me-1"></i>Nueva contraseña
+                        </label>
+                        <input type="password" class="form-control border-primary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: #007bff;">
+                            <i class="fas fa-key me-1"></i>Confirmar nueva contraseña
+                        </label>
+                        <input type="password" class="form-control border-primary" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #e8f4f8;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn text-white fw-bold"
+                        style="background: linear-gradient(90deg, #ffc107, #fd7e14); border: none;"
+                        onclick="cambiarPassword()">
+                    <i class="fas fa-sync-alt me-1"></i>Actualizar Contraseña
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 1rem;
+    }
+    
+    .card-header {
+        border-radius: 1rem 1rem 0 0 !important;
+    }
+    
+    /* Estilos para el avatar */
+    .avatar-container {
+        width: 120px;
+        height: 120px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(45deg, #e8f4f8, #d1ecf1);
+        border: 4px solid white;
+    }
+    
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Estilos para los iconos circulares */
+    .icon-container {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+    }
+    
+    .icon-container i {
+        font-size: 1.2rem;
+    }
+    
+    /* Efectos de hover */
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+    
+    .avatar-container:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+    
+    .border-4 {
+        border-width: 4px !important;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #007bff, #17a2b8) !important;
+    }
+    
+    .bg-gradient-secondary {
+        background: linear-gradient(45deg, #6c757d, #adb5bd) !important;
+    }
+</style>
+
+<script>
+    // Función para cambiar avatar
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarInput = document.createElement('input');
+        avatarInput.type = 'file';
+        avatarInput.accept = 'image/*';
+        avatarInput.style.display = 'none';
+        
+        document.querySelector('.avatar-container').addEventListener('click', function() {
+            avatarInput.click();
+        });
+        
+        avatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarImg = document.querySelector('.avatar-img');
+                    avatarImg.src = e.target.result;
+                    
+                    Swal.fire({
+                        title: '¡Perfecto!',
+                        text: 'Foto de perfil actualizada correctamente',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+    // Función para guardar cambios del perfil
+    function guardarCambios() {
+        Swal.fire({
+            title: '¡Éxito!',
+            text: 'Perfil actualizado correctamente',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
+        modal.hide();
+    }
+
+    // Función para cambiar contraseña
+    function cambiarPassword() {
+        Swal.fire({
+            title: '¡Contraseña Actualizada!',
+            text: 'Tu contraseña ha sido cambiada exitosamente',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('cambiarPasswordModal'));
+        modal.hide();
+    }
+</script>
+{% endblock %}
