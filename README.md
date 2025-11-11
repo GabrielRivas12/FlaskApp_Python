@@ -11,9 +11,9 @@ Este proyecto está basado en Flask, un micro-framework para Python que facilita
 
 Sigue estos pasos para configurar el entorno virtual y las dependencias necesarias:
     
-- pip install Flask
-- pip freeze > requirements.txt
-- pip install -r requirements.txt
+    ```pip install Flask
+    ```pip freeze > requirements.txt
+    ```pip install -r requirements.txt
 
 1. **Crear un entorno virtual**:
    
@@ -29,6 +29,6 @@ Sigue estos pasos para configurar el entorno virtual y las dependencias necesari
 
 3. ## Vista principal ##
 
-![alt text] (image.png)
-
-
+![alt text](image.png)
+![alt text](image2.png)
+![alt text](image3.png)
