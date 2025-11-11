@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_mysqldb import MySQL
 from passlib.hash import pbkdf2_sha256
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 app.secret_key = 'appsecretkey'  # clave secreta para la sesion
 
