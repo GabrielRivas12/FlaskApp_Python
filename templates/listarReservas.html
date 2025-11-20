@@ -86,7 +86,8 @@
                             <div class="input-group input-group-sm">
                                 <input type="text" class="form-control border-primary" id="buscar" name="buscar"
                                     value="{{ request.args.get('buscar', '') }}" placeholder="Buscar reservación..."
-                                    style="width: 200px;">
+                                    style="width: 200px;" 
+                                    title="Buscar por nombre del lugar, tipo de habitación o ubicación">
                                 <button type="submit" class="btn text-white" style="background-color: #007bff;">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -170,8 +171,8 @@
                                         data-bs-target="#modalEditar{{ reservacion.id }}" title="Editar reservación">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-outline-danger btn-eliminar"
-                                        data-url="{{ url_for('eliminar_producto', id=reservacion.id) }}"
+                                    <button class="btn btn-outline-danger btn-eliminar-reserva"
+                                        data-url="{{ url_for('eliminar_reservacion', id=reservacion.id) }}"
                                         data-nombre="{{ reservacion.nombrelugar }}" title="Eliminar reservación">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -198,8 +199,8 @@
                                         data-bs-target="#modalEditar{{ reservacion.id }}" title="Editar reservación">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-outline-danger btn-eliminar"
-                                        data-url="{{ url_for('eliminar_producto', id=reservacion.id) }}"
+                                    <button class="btn btn-outline-danger btn-eliminar-reserva"
+                                        data-url="{{ url_for('eliminar_reservacion', id=reservacion.id) }}"
                                         data-nombre="{{ reservacion.nombrelugar }}" title="Eliminar reservación">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -300,7 +301,7 @@
 <div class="modal fade" id="modalNuevaReservacion" tabindex="-1" aria-labelledby="modalNuevaLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
-            <form method="POST" action="{{ url_for('agregar_reservacion') }}">
+            <form method="POST" action="{{ url_for('agregar_reservacion') }}" id="formNuevaReservacion">
                 <div class="modal-header text-white rounded-top-3"
                     style="background: linear-gradient(90deg, #007bff, #17a2b8);">
                     <h5 class="modal-title" id="modalNuevaLabel">
@@ -316,7 +317,11 @@
                                 <label class="form-label fw-semibold" style="color: #007bff;">
                                     <i class="fas fa-hotel me-1"></i>Nombre del Lugar
                                 </label>
-                                <input type="text" name="nombrelugar" class="form-control border-primary" required>
+                                <input type="text" name="nombrelugar" class="form-control border-primary tooltip-input" 
+                                    required
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Ingrese el nombre del hotel o lugar de hospedaje">
+                                <div class="form-text">Ejemplo: Hotel Playa del Carmen</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -324,7 +329,11 @@
                                 <label class="form-label fw-semibold" style="color: #007bff;">
                                     <i class="fas fa-door-open me-1"></i>Número de Habitación
                                 </label>
-                                <input type="text" name="nhabitacion" class="form-control border-primary" required>
+                                <input type="text" name="nhabitacion" class="form-control border-primary tooltip-input" 
+                                    required
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Número o código identificador de la habitación">
+                                <div class="form-text">Ejemplo: 301, Suite A, Bungalow 5</div>
                             </div>
                         </div>
                     </div>
@@ -335,7 +344,10 @@
                                 <label class="form-label fw-semibold" style="color: #007bff;">
                                     <i class="fas fa-bed me-1"></i>Tipo de Habitación
                                 </label>
-                                <select name="tipohabitacion" class="form-control border-primary" required>
+                                <select name="tipohabitacion" class="form-control border-primary tooltip-input" 
+                                    required
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Seleccione el tipo de habitación según su capacidad y características">
                                     <option value="">Seleccione un tipo</option>
                                     <option value="Individual">Individual</option>
                                     <option value="Doble">Doble</option>
@@ -343,6 +355,7 @@
                                     <option value="Familiar">Familiar</option>
                                     <option value="Presidencial">Presidencial</option>
                                 </select>
+                                <div class="form-text">Seleccione la categoría de la habitación</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -350,7 +363,11 @@
                                 <label class="form-label fw-semibold" style="color: #007bff;">
                                     <i class="fas fa-users me-1"></i>Cantidad de Huéspedes
                                 </label>
-                                <input type="number" name="cantidadh" class="form-control border-primary" min="1" required>
+                                <input type="number" name="cantidadh" class="form-control border-primary tooltip-input" 
+                                    min="1" max="20" required
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Número máximo de personas que pueden hospedarse en la habitación">
+                                <div class="form-text">Máximo 20 huéspedes por habitación</div>
                             </div>
                         </div>
                     </div>
@@ -361,7 +378,11 @@
                                 <label class="form-label fw-semibold" style="color: #007bff;">
                                     <i class="fas fa-dollar-sign me-1"></i>Precio por Noche
                                 </label>
-                                <input type="number" step="0.01" name="precionoche" class="form-control border-primary" required>
+                                <input type="number" step="0.01" name="precionoche" class="form-control border-primary tooltip-input" 
+                                    min="0" required
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Precio por noche en la moneda local">
+                                <div class="form-text">Ingrese el precio sin símbolos de moneda</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -369,7 +390,11 @@
                                 <label class="form-label fw-semibold" style="color: #007bff;">
                                     <i class="fas fa-map-marker-alt me-1"></i>Ubicación
                                 </label>
-                                <input type="text" name="ubicacion" class="form-control border-primary" required>
+                                <input type="text" name="ubicacion" class="form-control border-primary tooltip-input" 
+                                    required
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="Ciudad, región o ubicación específica del establecimiento">
+                                <div class="form-text">Ejemplo: Cancún, Quintana Roo, México</div>
                             </div>
                         </div>
                     </div>
@@ -378,7 +403,11 @@
                         <label class="form-label fw-semibold" style="color: #007bff;">
                             <i class="fas fa-info-circle me-1"></i>Descripción
                         </label>
-                        <textarea name="descripcion" class="form-control border-primary" rows="3" required></textarea>
+                        <textarea name="descripcion" class="form-control border-primary tooltip-input" 
+                            rows="3" required
+                            data-bs-toggle="tooltip" data-bs-placement="top" 
+                            title="Describa las características, servicios incluidos y detalles importantes de la habitación"></textarea>
+                        <div class="form-text">Incluya detalles como vista, amenities, servicios, etc.</div>
                     </div>
                 </div>
                 <div class="modal-footer" style="background-color: #e8f4f8;">
@@ -402,7 +431,7 @@
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content border-0 shadow">
-                <form method="POST" action="{{ url_for('editar_producto_modal', id=reservacion.id) }}">
+                <form method="POST" action="{{ url_for('editar_producto_modal', id=reservacion.id) }}" id="formEditar{{ reservacion.id }}">
                     <div class="modal-header text-white rounded-top-3"
                         style="background: linear-gradient(90deg, #007bff, #17a2b8);">
                         <h5 class="modal-title" id="modalLabel{{ reservacion.id }}">
@@ -418,8 +447,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-hotel me-1"></i>Nombre del Lugar
                                     </label>
-                                    <input type="text" name="nombrelugar" class="form-control border-primary"
-                                        value="{{ reservacion.nombrelugar }}" required>
+                                    <input type="text" name="nombrelugar" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.nombrelugar }}" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Ingrese el nombre del hotel o lugar de hospedaje">
+                                    <div class="form-text">Ejemplo: Hotel Playa del Carmen</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -427,8 +459,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-door-open me-1"></i>Número de Habitación
                                     </label>
-                                    <input type="text" name="nhabitacion" class="form-control border-primary"
-                                        value="{{ reservacion.nhabitacion }}" required>
+                                    <input type="text" name="nhabitacion" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.nhabitacion }}" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Número o código identificador de la habitación">
+                                    <div class="form-text">Ejemplo: 301, Suite A, Bungalow 5</div>
                                 </div>
                             </div>
                         </div>
@@ -439,13 +474,16 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-bed me-1"></i>Tipo de Habitación
                                     </label>
-                                    <select name="tipohabitacion" class="form-control border-primary" required>
+                                    <select name="tipohabitacion" class="form-control border-primary tooltip-input" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Seleccione el tipo de habitación según su capacidad y características">
                                         <option value="Individual" {% if reservacion.tipohabitacion=='Individual' %}selected{% endif %}>Individual</option>
                                         <option value="Doble" {% if reservacion.tipohabitacion=='Doble' %}selected{% endif %}>Doble</option>
                                         <option value="Suite" {% if reservacion.tipohabitacion=='Suite' %}selected{% endif %}>Suite</option>
                                         <option value="Familiar" {% if reservacion.tipohabitacion=='Familiar' %}selected{% endif %}>Familiar</option>
                                         <option value="Presidencial" {% if reservacion.tipohabitacion=='Presidencial' %}selected{% endif %}>Presidencial</option>
                                     </select>
+                                    <div class="form-text">Seleccione la categoría de la habitación</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -453,8 +491,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-users me-1"></i>Cantidad de Huéspedes
                                     </label>
-                                    <input type="number" name="cantidadh" class="form-control border-primary"
-                                        value="{{ reservacion.cantidadh }}" min="1" required>
+                                    <input type="number" name="cantidadh" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.cantidadh }}" min="1" max="20" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Número máximo de personas que pueden hospedarse en la habitación">
+                                    <div class="form-text">Máximo 20 huéspedes por habitación</div>
                                 </div>
                             </div>
                         </div>
@@ -465,8 +506,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-dollar-sign me-1"></i>Precio por Noche
                                     </label>
-                                    <input type="number" step="0.01" name="precionoche" class="form-control border-primary"
-                                        value="{{ reservacion.precionoche }}" required>
+                                    <input type="number" step="0.01" name="precionoche" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.precionoche }}" min="0" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Precio por noche en la moneda local">
+                                    <div class="form-text">Ingrese el precio sin símbolos de moneda</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -474,8 +518,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-map-marker-alt me-1"></i>Ubicación
                                     </label>
-                                    <input type="text" name="ubicacion" class="form-control border-primary"
-                                        value="{{ reservacion.ubicacion }}" required>
+                                    <input type="text" name="ubicacion" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.ubicacion }}" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Ciudad, región o ubicación específica del establecimiento">
+                                    <div class="form-text">Ejemplo: Cancún, Quintana Roo, México</div>
                                 </div>
                             </div>
                         </div>
@@ -484,8 +531,11 @@
                             <label class="form-label fw-semibold" style="color: #007bff;">
                                 <i class="fas fa-info-circle me-1"></i>Descripción
                             </label>
-                            <textarea name="descripcion" class="form-control border-primary" rows="3"
-                                required>{{ reservacion.descripcion }}</textarea>
+                            <textarea name="descripcion" class="form-control border-primary tooltip-input" rows="3"
+                                required
+                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                title="Describa las características, servicios incluidos y detalles importantes de la habitación">{{ reservacion.descripcion }}</textarea>
+                            <div class="form-text">Incluya detalles como vista, amenities, servicios, etc.</div>
                         </div>
                     </div>
                     <div class="modal-footer" style="background-color: #e8f4f8;">
@@ -508,7 +558,7 @@
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content border-0 shadow">
-                <form method="POST" action="{{ url_for('editar_producto_modal', id=reservacion.id) }}">
+                <form method="POST" action="{{ url_for('editar_producto_modal', id=reservacion.id) }}" id="formEditar{{ reservacion.id }}">
                     <div class="modal-header text-white rounded-top-3"
                         style="background: linear-gradient(90deg, #007bff, #17a2b8);">
                         <h5 class="modal-title" id="modalLabel{{ reservacion.id }}">
@@ -524,8 +574,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-hotel me-1"></i>Nombre del Lugar
                                     </label>
-                                    <input type="text" name="nombrelugar" class="form-control border-primary"
-                                        value="{{ reservacion.nombrelugar }}" required>
+                                    <input type="text" name="nombrelugar" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.nombrelugar }}" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Ingrese el nombre del hotel o lugar de hospedaje">
+                                    <div class="form-text">Ejemplo: Hotel Playa del Carmen</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -533,8 +586,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-door-open me-1"></i>Número de Habitación
                                     </label>
-                                    <input type="text" name="nhabitacion" class="form-control border-primary"
-                                        value="{{ reservacion.nhabitacion }}" required>
+                                    <input type="text" name="nhabitacion" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.nhabitacion }}" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Número o código identificador de la habitación">
+                                    <div class="form-text">Ejemplo: 301, Suite A, Bungalow 5</div>
                                 </div>
                             </div>
                         </div>
@@ -545,13 +601,16 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-bed me-1"></i>Tipo de Habitación
                                     </label>
-                                    <select name="tipohabitacion" class="form-control border-primary" required>
+                                    <select name="tipohabitacion" class="form-control border-primary tooltip-input" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Seleccione el tipo de habitación según su capacidad y características">
                                         <option value="Individual" {% if reservacion.tipohabitacion=='Individual' %}selected{% endif %}>Individual</option>
                                         <option value="Doble" {% if reservacion.tipohabitacion=='Doble' %}selected{% endif %}>Doble</option>
                                         <option value="Suite" {% if reservacion.tipohabitacion=='Suite' %}selected{% endif %}>Suite</option>
                                         <option value="Familiar" {% if reservacion.tipohabitacion=='Familiar' %}selected{% endif %}>Familiar</option>
                                         <option value="Presidencial" {% if reservacion.tipohabitacion=='Presidencial' %}selected{% endif %}>Presidencial</option>
                                     </select>
+                                    <div class="form-text">Seleccione la categoría de la habitación</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -559,8 +618,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-users me-1"></i>Cantidad de Huéspedes
                                     </label>
-                                    <input type="number" name="cantidadh" class="form-control border-primary"
-                                        value="{{ reservacion.cantidadh }}" min="1" required>
+                                    <input type="number" name="cantidadh" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.cantidadh }}" min="1" max="20" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Número máximo de personas que pueden hospedarse en la habitación">
+                                    <div class="form-text">Máximo 20 huéspedes por habitación</div>
                                 </div>
                             </div>
                         </div>
@@ -571,8 +633,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-dollar-sign me-1"></i>Precio por Noche
                                     </label>
-                                    <input type="number" step="0.01" name="precionoche" class="form-control border-primary"
-                                        value="{{ reservacion.precionoche }}" required>
+                                    <input type="number" step="0.01" name="precionoche" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.precionoche }}" min="0" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Precio por noche en la moneda local">
+                                    <div class="form-text">Ingrese el precio sin símbolos de moneda</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -580,8 +645,11 @@
                                     <label class="form-label fw-semibold" style="color: #007bff;">
                                         <i class="fas fa-map-marker-alt me-1"></i>Ubicación
                                     </label>
-                                    <input type="text" name="ubicacion" class="form-control border-primary"
-                                        value="{{ reservacion.ubicacion }}" required>
+                                    <input type="text" name="ubicacion" class="form-control border-primary tooltip-input"
+                                        value="{{ reservacion.ubicacion }}" required
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Ciudad, región o ubicación específica del establecimiento">
+                                    <div class="form-text">Ejemplo: Cancún, Quintana Roo, México</div>
                                 </div>
                             </div>
                         </div>
@@ -590,8 +658,11 @@
                             <label class="form-label fw-semibold" style="color: #007bff;">
                                 <i class="fas fa-info-circle me-1"></i>Descripción
                             </label>
-                            <textarea name="descripcion" class="form-control border-primary" rows="3"
-                                required>{{ reservacion.descripcion }}</textarea>
+                            <textarea name="descripcion" class="form-control border-primary tooltip-input" rows="3"
+                                required
+                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                title="Describa las características, servicios incluidos y detalles importantes de la habitación">{{ reservacion.descripcion }}</textarea>
+                            <div class="form-text">Incluya detalles como vista, amenities, servicios, etc.</div>
                         </div>
                     </div>
                     <div class="modal-footer" style="background-color: #e8f4f8;">
@@ -613,6 +684,12 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const tabla = document.getElementById("tablaReservaciones");
+        
+        // Inicializar tooltips de Bootstrap
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
 
         // 📋 COPIAR
         document.getElementById("btnCopiar").addEventListener("click", function () {
@@ -765,8 +842,8 @@
             printWindow.document.close();
         });
 
-        // 🗑️ ELIMINAR RESERVACIÓN CON SWEETALERT
-        document.querySelectorAll('.btn-eliminar').forEach(button => {
+        // 🗑️ ELIMINAR RESERVACIÓN CON SWEETALERT (CORREGIDO)
+        document.querySelectorAll('.btn-eliminar-reserva').forEach(button => {
             button.addEventListener('click', function () {
                 const url = this.getAttribute('data-url');
                 const nombre = this.getAttribute('data-nombre');
@@ -788,19 +865,56 @@
                     buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Mostrar mensaje de confirmación antes de redirigir
-                        Swal.fire({
-                            title: '¡Eliminado!',
-                            text: `La reservación "${nombre}" ha sido eliminada correctamente.`,
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            // Redirigir a la URL de eliminación
-                            window.location.href = url;
-                        });
+                        // Redirigir directamente a la URL de eliminación
+                        window.location.href = url;
                     }
                 });
+            });
+        });
+        
+        // Validación de formularios en modales
+        document.querySelectorAll('form[id^="form"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const inputs = this.querySelectorAll('input[required], select[required], textarea[required]');
+                
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                        
+                        // Mostrar tooltip de error
+                        const tooltip = bootstrap.Tooltip.getInstance(input);
+                        if (tooltip) {
+                            tooltip.setContent({'.tooltip-inner': 'Este campo es obligatorio'});
+                            tooltip.show();
+                            
+                            // Ocultar después de 3 segundos
+                            setTimeout(() => {
+                                tooltip.hide();
+                            }, 3000);
+                        }
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Campos incompletos',
+                        text: 'Por favor, complete todos los campos requeridos',
+                        icon: 'warning',
+                        confirmButtonColor: '#007bff'
+                    });
+                }
+            });
+        });
+        
+        // Limpiar validación al cambiar valores
+        document.querySelectorAll('.tooltip-input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
             });
         });
     });
@@ -841,6 +955,41 @@
     .page-link:hover {
         transform: translateY(-1px);
         transition: all 0.3s ease;
+    }
+    
+    
+    .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+    
+    .tooltip-inner {
+        max-width: 300px;
+        padding: 8px 12px;
+        background-color: #17a2b8;
+        font-size: 0.875rem;
+    }
+    
+    .tooltip.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: #17a2b8;
+    }
+    
+    .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: #17a2b8;
+    }
+    
+    .tooltip.bs-tooltip-start .tooltip-arrow::before {
+        border-left-color: #17a2b8;
+    }
+    
+    .tooltip.bs-tooltip-end .tooltip-arrow::before {
+        border-right-color: #17a2b8;
     }
 </style>
 
